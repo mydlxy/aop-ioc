@@ -1,0 +1,6 @@
+<beans>
+    <propertyPlaceholder load="test.properties"/>
+
+
+
+</beans>
