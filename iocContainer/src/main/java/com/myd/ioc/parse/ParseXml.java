@@ -1,22 +1,20 @@
 package com.myd.ioc.parse;
 
+import com.myd.ioc.context.XmlConfiguration;
 import com.myd.ioc.beans.BeanDefinition;
 import com.myd.ioc.beans.PropertyValue;
-import com.myd.ioc.exception.PropertiesKeyNotFound;
+import com.myd.ioc.exception.RefNotFoundError;
 import com.myd.ioc.exception.XmlLabelNameError;
+import com.myd.ioc.utils.BeanUtils;
 import com.myd.ioc.utils.XmlUtils;
-import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+
+import  org.apache.log4j.Logger;
 
 /**
  * @author myd
@@ -25,9 +23,7 @@ import java.util.Properties;
 
 public class ParseXml {
 
-
-
-
+private static Logger log  = Logger.getLogger(ParseXml.class);
 
     /**
      *
@@ -35,32 +31,36 @@ public class ParseXml {
      * @param path
      * @return
      */
-    public static List<BeanDefinition> parseXml(String path) throws Exception {
+    public static XmlConfiguration parseXml(String path) throws Exception {
 
-        path = Thread.currentThread().getContextClassLoader().getResource(path).getPath();
-        List<BeanDefinition> beanDefinitions = new ArrayList<>();//xml解析出来的bean存放在beanDefinitions
+        log.info("parse xml start.....");
+        String configLocation = Thread.currentThread().getContextClassLoader().getResource(path).getPath();
+        XmlConfiguration xmlConfiguration = XmlConfiguration.getInstance().setConfigLocation(configLocation);
         SAXReader saxReader = new SAXReader();
-        Document dom = saxReader.read(new File(path));
+        Document dom = saxReader.read(new File(configLocation));
         Element root = dom.getRootElement();
         List<Element> elements = root.elements();
-        Properties properties=null;
         for (Element element : elements) {
             String name = element.getName();//获取标签名；
             XmlUtils.checkNodeName(name);
             if(name.equals("bean")){//解析bean标签
-                BeanDefinition beanDefinition = parseBean(element);
-                beanDefinitions.add(beanDefinition);
+                parseBean(element, xmlConfiguration);
             }else if(name.equals("propertyPlaceholder")){//加载properties文件
-                 properties = parsePropertiesFile(element);
-             }else if(name.equals("annotations")){
-
+                parsePropertiesFile(element, xmlConfiguration);
+             }else if(name.equals("ComponentScan")){
+                //后续添加annotation解析;
+                xmlConfiguration.setAnnotationPackage(element.attributeValue("package"));
             }
         }
+        log.info("parse xml has end.....");
+        //将 '${}'替换成值
+        replaceBeanDefinitionValue(xmlConfiguration.getProperties(), xmlConfiguration.getBeanDefinitions().values());
 
-        replaceValue(properties,beanDefinitions);
+        //检查bean属性引用的ref值是否正确
+        checkBeanPropertyRef(xmlConfiguration);
 
 
-        return beanDefinitions;
+        return xmlConfiguration;
 
     }
 
@@ -76,48 +76,49 @@ public class ParseXml {
      * @param bean
      * @return
      */
-    public static BeanDefinition parseBean(Element bean){
+    public static void parseBean(Element bean, XmlConfiguration xmlConfiguration){
 
         BeanDefinition beanDefinition = new BeanDefinition();
         String id = bean.attributeValue("id");
         String className = bean.attributeValue("class");
-        List<PropertyValue> propertyValues = new ArrayList<>();
+        beanDefinition.setId(id).setClassName(className);
         List<Element> properties = bean.elements();
         for (Element property : properties) {//属性解析
             PropertyValue propertyValue = new PropertyValue();
             String name = property.getName();
             XmlUtils.checkNodeName(name);
             if(name.equals("constructor")){
-                propertyValue.setConstructor(true);
+                parseBeanProperty(property,propertyValue,beanDefinition.getConstructorValues());
             }else if(name.equals("property")){
-                propertyValue.setConstructor(false);
+                parseBeanProperty(property,propertyValue,beanDefinition.getPropertyValues());
             }else{
                 throw new XmlLabelNameError("<"+name+" > cannot be used in <bean> tags");
             }
-            parseBeanProperty(property,propertyValue);
-            propertyValues.add(propertyValue);
-        }
-        beanDefinition.setId(id).setClassName(className).setPropertyValues(propertyValues);
-        return beanDefinition;
 
+        }
+        xmlConfiguration.addBeanDefinition(id,beanDefinition);
     }
 
     /**
      * 解析bean的属性标签
-     *
+     *<property name="" value=""/>
+     *<property name ="" ref=""/>
      * @param property
      * @param propertyValue
      */
-    public static void parseBeanProperty(Element property,PropertyValue propertyValue){
+    public static void parseBeanProperty(Element property,PropertyValue propertyValue,List<PropertyValue> beanValues){
+        String name = property.attributeValue("name");
+//        if(name == null || name.trim().equals(""))
+//            throw new XmlAttributeNullPointerError();
         propertyValue.setPropertyName(property.attributeValue("name"));
+
         String value = property.attributeValue("value");
         if(value != null){
-            propertyValue.setValue(value);
-            propertyValue.setRef(false);
+            propertyValue.setValue(value).setRef(false);
         }else{
-            propertyValue.setValue(property.attributeValue("ref"));
-            propertyValue.setRef(true);
+            propertyValue.setValue(property.attributeValue("ref")).setRef(true);
         }
+        beanValues.add(propertyValue);
     }
 
 
@@ -128,9 +129,11 @@ public class ParseXml {
      *
      * @param propertiesFile
      */
-    public static Properties parsePropertiesFile(Element propertiesFile)throws IOException{
+    public static void parsePropertiesFile(Element propertiesFile, XmlConfiguration xmlConfiguration)throws IOException{
         String path = propertiesFile.attributeValue("load");
-        return ParseProperty.parseProperty(path);
+        xmlConfiguration.setPropertiesPath(path);
+        Properties properties = ParseProperty.parseProperty(path);
+        xmlConfiguration.setProperties(properties);
     }
 
 
@@ -143,7 +146,7 @@ public class ParseXml {
      * username=root<br/>
      *
      * xml中bean引用了properties的username<br/>
-     * <bean id ="" class="">
+     * <bean>
      *     <property name="name" value="${username}"/>
      *</bean>
      *
@@ -154,22 +157,57 @@ public class ParseXml {
      * @param properties properties文件中定义的key-value键值对
      * @param beanDefinitions 解析xml文件中bean信息
      */
-    public static void replaceValue(Properties properties,List<BeanDefinition> beanDefinitions){
-        if(properties.isEmpty() || beanDefinitions.isEmpty())return;
+    public static void replaceBeanDefinitionValue(Properties properties,Collection<BeanDefinition> beanDefinitions){
+        if(properties == null || properties.isEmpty() || beanDefinitions.isEmpty())return;
         for (BeanDefinition beanDefinition : beanDefinitions) {
             List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
-            for (PropertyValue propertyValue : propertyValues) {
-                String value = propertyValue.getValue().trim();
-                if(value.matches("^(\\$\\{).+\\}$")){//截取key：${username} >  username-
-                    String propertiesKey= value.substring(2,value.length()-1);
-                    String propertiesValue = (String)properties.get(value);
-                    if(propertiesValue == null){
-                        throw new PropertiesKeyNotFound(beanDefinition.getClassName()+" property value :" +value+" not found in properties file");
-                    }
-                    propertyValue.setValue(propertiesValue);
-                }
-            }
+            List<PropertyValue> constructorValues = beanDefinition.getConstructorValues();
+            replaceValues(properties,propertyValues);
+            replaceValues(properties,constructorValues);
         }
+    }
+
+    public static void replaceValues(Properties properties,List<PropertyValue> values){
+        for (PropertyValue propertyValue: values) {
+            String value = BeanUtils.replaceValue(properties, propertyValue.getValue().trim());
+            propertyValue.setValue(value);
+        }
+
+    }
+
+
+    /**
+     * 检查beanDefinition 的ref引用值是否正确；
+     * @param xmlConfiguration
+     */
+    public static void checkBeanPropertyRef(XmlConfiguration xmlConfiguration){
+        Map<String, BeanDefinition> beanDefinitions = xmlConfiguration.getBeanDefinitions();
+        if(beanDefinitions.isEmpty())return;
+        Set<String> refs = beanDefinitions.keySet();//id值
+        Collection<BeanDefinition> beans = beanDefinitions.values();
+        for (BeanDefinition bean : beans) {
+            checkBeanPropertyRef(bean,refs);
+        }
+    }
+
+    public static void checkBeanPropertyRef(BeanDefinition beanDefinition,Set<String> refs ){
+        List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
+        List<PropertyValue> constructorValues = beanDefinition.getConstructorValues();
+        List<PropertyValue> allPropertyValues = new ArrayList<>();
+//        propertyValues.addAll(constructorValues);//合并2个list
+        allPropertyValues.addAll(propertyValues);
+        allPropertyValues.addAll(constructorValues);
+        for (PropertyValue propertyValue : allPropertyValues) {
+            boolean ref = propertyValue.isRef();
+            if(ref){
+                String refValue = propertyValue.getValue();
+                if(!refs.contains(refValue))throw new RefNotFoundError(beanDefinition.getClassName()+" ref =" +refValue+" xml not found error.");
+            }
+
+        }
+
+
+
     }
 
 

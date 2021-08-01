@@ -1,7 +1,8 @@
 package parse;
 
 import com.myd.ioc.parse.ParseProperty;
-import org.junit.Test;
+import com.myd.ioc.parse.ParseXml;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -62,10 +63,6 @@ public class TestParse {
         }
 
 
-    }
-    public void gg(String name,String id){
-
-        System.out.println(name+id);
     }
 
 

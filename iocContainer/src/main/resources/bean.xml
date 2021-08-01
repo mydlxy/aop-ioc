@@ -1,6 +1,18 @@
 <beans>
     <propertyPlaceholder load="test.properties"/>
 
+    <bean id="t" class="parse.model.Teacher">
 
+        <constructor name="classNo" value="55"/>
+        <constructor name="name" value="teacher1"/>
+
+    </bean>
+
+    <bean id ="u" class="parse.model.User">
+        <constructor name="teacher" ref="t"/>
+        <property name="name" value="myd"/>
+    </bean>
+
+    <ComponentScan package="parse.anno.component"/>
 
 </beans>

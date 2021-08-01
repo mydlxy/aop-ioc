@@ -9,6 +9,11 @@ import com.myd.ioc.exception.XmlLabelNameError;
 
 public class XmlUtils {
 
+    /**
+     * com.myd.ioc.utils.NodeName：定义合法标签名
+     * 检查标签名是否正确
+     * @param nodeName
+     */
     public static void checkNodeName(String nodeName){
         NodeName node = Enum.valueOf(NodeName.class,nodeName);
         switch(node){
@@ -24,6 +29,7 @@ public class XmlUtils {
         }
 
     }
+
 
 
 

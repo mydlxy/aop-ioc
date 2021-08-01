@@ -7,7 +7,7 @@ package com.myd.ioc.exception;
 
 /**
  *
- * 加载class重复报错
+ * 加载bean时，id 重复报错
  *
  *
  */

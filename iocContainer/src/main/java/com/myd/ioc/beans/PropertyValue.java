@@ -5,6 +5,22 @@ package com.myd.ioc.beans;
  * @date 2021/7/24  0:33
  */
 
+/**
+ *
+ * bean 标签中每一个标签对应一个PropertyValue 对象<br>
+ *
+ * e.g.
+ *
+ * <bean>
+ *     <constructor name="" value=""/>
+ *     <constructor name="" ref=""/>
+ *     <property name="" value=""/>
+ *     <property name="" ref=""/>
+ * </bean>
+ *
+ * 在解析xml的bean标签时，会生成4个PropertyValue对象
+ *
+ */
 public class PropertyValue {
 
     private String propertyName;
@@ -13,37 +29,31 @@ public class PropertyValue {
 
     private boolean ref;//值是否是ref类型;
 
-    private boolean constructor;//判断标签:constructor
-
     public String getPropertyName() {
         return propertyName;
     }
 
-    public void setPropertyName(String propertyName) {
+
+    public PropertyValue setPropertyName(String propertyName) {
         this.propertyName = propertyName;
+        return this;
     }
 
     public String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public PropertyValue setValue(String value) {
         this.value = value;
+        return this;
     }
 
     public boolean isRef() {
         return ref;
     }
 
-    public void setRef(boolean ref) {
+    public PropertyValue setRef(boolean ref) {
         this.ref = ref;
-    }
-
-    public boolean isConstructor() {
-        return constructor;
-    }
-
-    public void setConstructor(boolean constructor) {
-        this.constructor = constructor;
+        return this;
     }
 }

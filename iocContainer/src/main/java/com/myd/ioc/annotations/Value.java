@@ -7,20 +7,21 @@ import java.lang.annotation.Target;
 
 /**
  * @author myd
- * @date 2021/7/27  0:49
- */
-/**
- * 在class上使用该注解，表示该类作为一个配置类；与@Bean一起使用
+ * @date 2021/7/28  11:15
  */
 
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Configuration {
+@Target(ElementType.FIELD)
+public @interface Value {
 
     /**
-     * properties文件的类路径，可以配置多个properties文件
+     *
+     *
+     * 基础类型,包装类型,String的字段可以用@Value来注解；
+     * 可以使用 '${}' 引用properties定义的值；
+     *
      *
      * @return
      */
-    String[] loadProperties() default "";
+    String value();
 }
