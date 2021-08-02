@@ -92,7 +92,7 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
             }else if(name.equals("property")){
                 parseBeanProperty(property,propertyValue,beanDefinition.getPropertyValues());
             }else{
-                throw new XmlLabelNameError("<"+name+" > cannot be used in <bean> tags");
+                throw new XmlLabelNameError("标签：<"+name+" > 不能被用在 <bean>中");
             }
 
         }
@@ -108,10 +108,7 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
      */
     public static void parseBeanProperty(Element property,PropertyValue propertyValue,List<PropertyValue> beanValues){
         String name = property.attributeValue("name");
-//        if(name == null || name.trim().equals(""))
-//            throw new XmlAttributeNullPointerError();
         propertyValue.setPropertyName(property.attributeValue("name"));
-
         String value = property.attributeValue("value");
         if(value != null){
             propertyValue.setValue(value).setRef(false);

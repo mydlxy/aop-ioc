@@ -1,7 +1,9 @@
 package parse.anno.component;
 
+import com.myd.ioc.annotations.Autowired;
 import com.myd.ioc.annotations.Component;
 import com.myd.ioc.annotations.Value;
+import parse.model.User;
 
 /**
  * @author myd
@@ -10,9 +12,13 @@ import com.myd.ioc.annotations.Value;
 @Component
 public class DatabaseConfig {
 
+   @Autowired
+   private User user;//xml配置
+   @Autowired
+   private Model2 model2;//注解配置
    @Value("${username}")
    private  String username;
-   @Value("${url}")
+   @Value("url0000tooorrr")
    private String url;
    @Value("${password}")
    private String password;

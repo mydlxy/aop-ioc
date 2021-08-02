@@ -15,17 +15,11 @@ public class XmlUtils {
      * @param nodeName
      */
     public static void checkNodeName(String nodeName){
-        NodeName node = Enum.valueOf(NodeName.class,nodeName);
-        switch(node){
-            case beans:
-            case bean:
-            case property:
-            case constructor:
-            case propertyPlaceholder:
-            case ComponentScan:
-                        break;
-            default:
-                throw new XmlLabelNameError("nodeName:<"+nodeName+"> error, NodeName  is not defined ");
+        try {
+            Enum.valueOf(NodeName.class, nodeName);
+        }catch (IllegalArgumentException e){
+            throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
+
         }
 
     }

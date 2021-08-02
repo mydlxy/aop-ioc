@@ -5,13 +5,14 @@
 
         <constructor name="classNo" value="55"/>
         <constructor name="name" value="teacher1"/>
-
+<bean />
     </bean>
 
     <bean id ="u" class="parse.model.User">
         <constructor name="teacher" ref="t"/>
         <property name="name" value="myd"/>
     </bean>
+    <beandd />
 
     <ComponentScan package="parse.anno.component"/>
 

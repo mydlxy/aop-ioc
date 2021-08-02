@@ -36,7 +36,7 @@ public class IocContainer {
     public Object getBean(String id){
         Object bean = beans.get(id);
         if(bean == null)
-            throw new NullPointerException("this id: "+id+" is not defined in the container.");
+            throw new NullPointerException("id: '"+id+"' is not defined in the container.");
         return beans.get(id);
     }
 

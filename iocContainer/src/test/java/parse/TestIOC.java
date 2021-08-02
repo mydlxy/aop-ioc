@@ -23,7 +23,7 @@ public class TestIOC {
     @Test
     public void test() throws Exception {
         ApplicationContext context = new XmlApplicationContext("bean.xml");
-        Teacher t = (Teacher)context.getBean("t");
+        Teacher t = context.getBean("llt");
         Model model = context.getBean("mmm");
         System.out.println(model.toString());
         System.out.println(model.getUser().toString());
@@ -63,14 +63,6 @@ public class TestIOC {
 
 
 //        System.out.println(list);
-    }
-
-    @Test
-    public void testStr(){
-
-        boolean t = "dgdfg*fg**hf".contains("***");
-        System.out.println(t);
-
     }
 
     @Test

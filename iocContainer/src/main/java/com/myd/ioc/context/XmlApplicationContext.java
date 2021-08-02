@@ -25,7 +25,6 @@ public class XmlApplicationContext implements ApplicationContext {
     public void loadBeans(String configLocation) throws Exception {
         this.xmlConfiguration  = ParseXml.parseXml(configLocation);
         defaultBeanFactory = new DefaultBeanFactory(xmlConfiguration);
-        defaultBeanFactory.createBeans(xmlConfiguration.getBeanDefinitions().values());
         if(xmlConfiguration.getAnnotationPackage()!= null){
             annotationApplicationContext = new AnnotationApplicationContext(xmlConfiguration.getAnnotationPackage(),xmlConfiguration);
         }

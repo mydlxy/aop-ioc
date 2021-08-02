@@ -38,22 +38,6 @@ public class TestParameters {
     }
 
 
-    @Test
-    public void testArray(){
-
-        List<Integer> a = new ArrayList<>();
-        List<Integer> b = new ArrayList<>();
-        for (int i = 0; i <10 ; i++) {
-            a.add(i);
-            b.add(i+10);
-        }
-
-         a.addAll(b);
-        System.out.println(a.size());
-        for (Integer integer : a) {
-            System.out.println(integer);
-        }
-    }
 
 
 

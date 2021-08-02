@@ -38,9 +38,10 @@ public class DefaultBeanFactory implements BeanFactory {
    private List<String> currentCreateBean = new ArrayList<>();
    private XmlConfiguration xmlConfiguration;
 
-   public DefaultBeanFactory(XmlConfiguration xmlConfiguration){
+   public DefaultBeanFactory(XmlConfiguration xmlConfiguration) throws ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException {
        this.xmlConfiguration = xmlConfiguration;
        this.container = IocContainer.container();
+       createBeans(xmlConfiguration.getBeanDefinitions().values());
    }
 
    public Object getBean(String id){
