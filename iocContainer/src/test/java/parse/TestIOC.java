@@ -66,23 +66,8 @@ public class TestIOC {
     }
 
     @Test
-    public void testrEGEX(){
-        List<String> names = RegexUtils.scanClassNames("com.myd.ioc");
-
-        System.out.println(names.size());
-        int i=1;
-        for (String name : names) {
-            if(i%3==0){
-                System.out.println("\n");
-            }
-                System.out.print(name+"\t");
-        }
-    }
-
-    @Test
     public void testPath(){
         //获取项目根路径
         System.out.println(TestIOC.class.getResource("/").getPath());
-        // path: /E:/Project/IDEA/2021/07/aop-ioc/iocContainer/target/test-classes/
     }
 }

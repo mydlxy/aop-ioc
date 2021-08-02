@@ -19,8 +19,9 @@ public class XmlUtils {
             Enum.valueOf(NodeName.class, nodeName);
         }catch (IllegalArgumentException e){
             throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
-
         }
+
+
 
     }
 
