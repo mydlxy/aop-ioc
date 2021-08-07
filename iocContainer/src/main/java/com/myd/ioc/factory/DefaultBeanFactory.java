@@ -1,5 +1,7 @@
 package com.myd.ioc.factory;
 
+import com.myd.aop.BeanPostAfterInitProcessor;
+import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.beans.BeanDefinition;
 import com.myd.ioc.beans.IocContainer;
 import com.myd.ioc.beans.PropertyValue;
@@ -55,11 +57,21 @@ public class DefaultBeanFactory implements BeanFactory {
        for (BeanDefinition beanDefinition : beanDefinitions) {
            createBean(beanDefinition);
        }
+       //在生成完bean之后，再检查class是否需要aop
+       if(AspectConfig.hasAspectConfig()){
+           try {
+               BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
+               beanPostAfterInitProcessor.postProcessAllBean();
+           } catch (NoSuchMethodException e) {
+               e.printStackTrace();
+               throw new RuntimeException(e);
+           }
+
+       }
 
        for (BeanDefinition beanDefinition : beanDefinitions) {
            Object bean = container.getBean(beanDefinition.getId());
            assembleBean(beanDefinition,bean);
-
        }
 
    }
@@ -85,6 +97,11 @@ public class DefaultBeanFactory implements BeanFactory {
         container.registerBean(id,bean);
         currentCreateBean.remove(className);
         return (T)bean;
+    }
+
+    public void registerBean(String id,Object bean){
+
+
     }
 
 

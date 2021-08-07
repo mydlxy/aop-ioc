@@ -54,5 +54,40 @@ public enum NodeName {
      * <ComponentScan package=""/>
      *  package:指定扫描包
      */
-    ComponentScan
+    ComponentScan,
+
+    /**
+     * 切面
+     * <aspect id="">
+     *
+     */
+    aspect,
+
+    /**
+     * <after  pointcut="" method=""/>
+     */
+
+    after,
+
+    /**
+     *
+     * <before pointcut="" method=""/>
+     */
+    before,
+
+    /**
+     *<afterReturning pointcut="" method=""/>
+     */
+    afterReturning,
+
+    /**
+     * <afterThrowable pointcut="" method=""/>
+     */
+    afterThrowable,
+
+    /**
+     * <around pointcut="" method=""/>
+     */
+    around
+
 }

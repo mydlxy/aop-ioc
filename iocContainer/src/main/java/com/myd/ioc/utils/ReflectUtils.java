@@ -1,9 +1,6 @@
 package com.myd.ioc.utils;
 
-import com.myd.ioc.annotations.Configuration;
-
 import java.lang.reflect.Field;
-import java.util.List;
 
 /**
  * @author myd

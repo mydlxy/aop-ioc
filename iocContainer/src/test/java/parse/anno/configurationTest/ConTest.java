@@ -9,7 +9,6 @@ import parse.model.User;
  */
 
 
-@Service
 public class ConTest {
 
 

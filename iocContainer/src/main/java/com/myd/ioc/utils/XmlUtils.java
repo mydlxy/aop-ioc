@@ -14,19 +14,77 @@ public class XmlUtils {
      * 检查标签名是否正确
      * @param nodeName
      */
-    public static void checkNodeName(String nodeName){
+    private static void checkNodeName(String nodeName){
         try {
             Enum.valueOf(NodeName.class, nodeName);
         }catch (IllegalArgumentException e){
+            throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
+        }
+    }
+
+    /**
+     *
+     * aspect的子标签名检查
+     *
+     * @param nodeName
+     */
+    public static void checkAspectNodeName(String nodeName){
+        try {
+            NodeName node = Enum.valueOf(NodeName.class, nodeName);
+            switch (node) {
+                case after:
+                case before:
+                case afterReturning:
+                case afterThrowable:
+                case around:
+                    break;
+                default:
+                    throw new XmlLabelNameError("标签:<" + nodeName + "> ,不是<aspect>的子标签");
+            }
+        }catch(IllegalArgumentException e){
+            throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
+        }
+    }
+
+
+    public static void checkBeanNodeName(String nodeName){
+        try{
+            NodeName node =  Enum.valueOf(NodeName.class,nodeName);
+            switch (node){
+                case constructor:
+                case property:
+                    break;
+                default:
+                    throw new XmlLabelNameError("标签:<" + nodeName + "> ,不是<bean>的子标签");
+            }
+        }catch (IllegalArgumentException e){
+            throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
+        }
+
+    }
+
+
+
+
+    public static void checkRootNodeName(String nodeName){
+        try {
+            NodeName node = Enum.valueOf(NodeName.class, nodeName);
+            switch (node) {
+                case bean:
+                case propertyPlaceholder:
+                case aspect:
+                case ComponentScan:
+                    break;
+                default:
+                    throw new XmlLabelNameError("标签:<" + nodeName + "> ,不是<beans>的子标签。");
+            }
+        }catch(IllegalArgumentException e){
             throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
         }
 
 
 
     }
-
-
-
 
 
 }

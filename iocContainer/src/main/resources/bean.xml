@@ -5,14 +5,22 @@
 
         <constructor name="classNo" value="55"/>
         <constructor name="name" value="teacher1"/>
-<bean />
     </bean>
-
     <bean id ="u" class="parse.model.User">
         <constructor name="teacher" ref="t"/>
         <property name="name" value="myd"/>
     </bean>
-    <beandd />
+
+    <bean id="log" class="parse.Log"/>
+
+    <aspect id="log">
+        <after  pointcut="execution(* parse.anno.component.*(..))" method="we"/>
+       <!-- <before pointcut="" method=""/>
+        <afterReturning pointcut="" method=""/>
+        <afterThrowable pointcut="" method=""/>
+        <around pointcut="" method=""/>-->
+    </aspect>
+
 
     <ComponentScan package="parse.anno.component"/>
 

@@ -15,6 +15,38 @@ import java.util.*;
 public class TestParameters {
 
 
+
+    public void testArray(Integer[] a,boolean b){
+
+        System.out.println(a.length);
+        System.out.println(b);
+
+    }
+    @Test
+    public void testTT() throws NoSuchMethodException {
+        Method[] methods = TestParameters.class.getMethods();
+
+        for (Method method : methods) {
+
+            System.out.println("methodName:"+method.getName()+"; parameters:");
+
+            Parameter[] parameters = method.getParameters();
+            for (Parameter parameter : parameters) {
+                System.out.println(parameter.getName());
+            }
+
+
+            Class<?>[] types = method.getParameterTypes();
+            for (Class<?> type : types) {
+                System.out.println(type.getSimpleName());
+            }
+
+
+        }
+
+
+
+    }
     @Test
     public void getMeterName(){
 

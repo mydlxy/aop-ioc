@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import parse.anno.component.DatabaseConfig;
 import parse.anno.component.Model;
 import parse.model.Teacher;
+import parse.model.User;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,17 +23,16 @@ public class TestIOC {
 
     @Test
     public void test() throws Exception {
+        System.out.println(Teacher.class.getName());
         ApplicationContext context = new XmlApplicationContext("bean.xml");
-        Teacher t = context.getBean("llt");
-        Model model = context.getBean("mmm");
-        System.out.println(model.toString());
-        System.out.println(model.getUser().toString());
-        System.out.println(model.getUser().getTeacher().toString());
-//        context.
+        Teacher t = context.getBean(Teacher.class);
+        User user = context.getBean(User.class);
+        System.out.println(user.toString());
+        System.out.println(user.getTeacher().toString());
         System.out.println(t.toString());
-        DatabaseConfig databaseConfig = context.getBean(DatabaseConfig.class);
+        System.out.println("===============================");
 
-        System.out.println(databaseConfig.toString());
+
 
 
     }
@@ -70,4 +70,13 @@ public class TestIOC {
         //获取项目根路径
         System.out.println(TestIOC.class.getResource("/").getPath());
     }
+
+    public void test22(String q,int r){
+
+    }
+
+    public void test22(int g,String d){
+
+    }
+
 }

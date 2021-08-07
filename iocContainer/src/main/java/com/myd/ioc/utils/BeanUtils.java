@@ -140,14 +140,16 @@ public class BeanUtils {
      * @return
      */
     public static Constructor getConstructor(Class beanClass, List<PropertyValue> constructorParameters){
+
         List<String> parameterNames = getConstructorParameterNames(constructorParameters);
         Constructor[] constructors = beanClass.getConstructors();
         for (Constructor constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
+
             boolean match = matchParameterNameList(parameters, parameterNames);
             if(match)return constructor;
         }
-        throw new MatchConstructorError("create bean : "+beanClass.getName()+"no matching parameter list ");
+        throw new MatchConstructorError("create bean : "+beanClass.getName()+" no matching parameter list ");
     }
 
 

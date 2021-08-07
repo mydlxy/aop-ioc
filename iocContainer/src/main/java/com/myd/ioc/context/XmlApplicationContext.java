@@ -1,5 +1,7 @@
 package com.myd.ioc.context;
 
+import com.myd.aop.BeanPostAfterInitProcessor;
+import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.factory.DefaultBeanFactory;
 import com.myd.ioc.parse.ParseXml;
 
@@ -28,6 +30,13 @@ public class XmlApplicationContext implements ApplicationContext {
         if(xmlConfiguration.getAnnotationPackage()!= null){
             annotationApplicationContext = new AnnotationApplicationContext(xmlConfiguration.getAnnotationPackage(),xmlConfiguration);
         }
+//        if(AspectConfig.hasAspectConfig()){
+//            BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
+//            beanPostAfterInitProcessor.postProcessAllBean();
+//        }
+
+
+
 
     }
 

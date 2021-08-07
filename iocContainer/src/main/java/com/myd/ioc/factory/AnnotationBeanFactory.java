@@ -1,5 +1,7 @@
 package com.myd.ioc.factory;
 
+import com.myd.aop.BeanPostAfterInitProcessor;
+import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.annotations.*;
 import com.myd.ioc.beans.IocContainer;
 import com.myd.ioc.context.XmlConfiguration;
@@ -75,6 +77,7 @@ public class AnnotationBeanFactory {
         for (String className : classNames) {
             Class beanClass = Class.forName(className);
             Object bean = beanClass.newInstance();
+            bean = beanPostProcess(bean);
             Component component = (Component) beanClass.getAnnotation(Component.class);
             if(component == null)continue;
             String id = getComponentId(beanClass,component);
@@ -86,10 +89,24 @@ public class AnnotationBeanFactory {
                 temp.put(id,autowired);
         }
         if(temp.isEmpty())return;
-
         injectAutowired(temp);
+    }
+
+    public Object beanPostProcess(Object target){
+        if(!AspectConfig.hasAspectConfig())return target;
+        try {
+            BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
+            return beanPostAfterInitProcessor.postProcessAfterInitialization(target);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
 
     }
+
+
+
     
     
     public String getComponentId(Class beanClass,Component component){
@@ -214,96 +231,7 @@ public class AnnotationBeanFactory {
             fields.add(field);
         }
         return fields;
-
     }
-
-
-
-    public void createBeans() throws Exception {
-
-        if(configClass == null)
-            findConfiguration("");//项目根目录寻找@Configuration
-
-        parseConfiguration();
-
-
-
-
-
-    }
-
-    /**
-     *找到@Configuration注解类；
-     *
-     * @return
-     */
-    public Class findConfiguration(String scanPackage) throws ClassNotFoundException {
-
-        List<String> classNames = RegexUtils.scanClassNames(scanPackage);
-        if(classNames.isEmpty())return null;
-        for (String className : classNames) {
-            Class configClass = Class.forName(className);
-            Annotation annotation = configClass.getAnnotation(com.myd.ioc.annotations.Configuration.class);
-            if(annotation!= null){
-                this.configClass=configClass;
-                return configClass;
-            }
-        }
-        throw new NullPointerException(" not class using  @Configuration");
-    }
-
-    public  void parseConfiguration() throws ClassNotFoundException, IOException, IllegalAccessException, InstantiationException {
-        Object bean = configClass.newInstance();
-        Configuration annotation = (Configuration)configClass.getAnnotation(Configuration.class);
-        String[] paths = annotation.loadProperties();
-        if(!nullPath(paths)){
-            parseProperties(paths);
-        }
-        ComponentScan componentScan = (ComponentScan)configClass.getAnnotation(ComponentScan.class);
-        String basePackage = componentScan.basePackage();
-        registerBean(basePackage);
-        Field[] fields = configClass.getDeclaredFields();
-
-    }
-
-    /**
-     *
-     *
-     * 现在字段注释就2种
-     * ：@Value：处理基本类型 ,包装类,String
-     * :@AutoWired 处理Object，必须要在xml中注册了或者是被@Component注解过；否则不会生效
-     * @param fields
-     * @param config
-     */
-    public void parseFieldsAnnotation(Field[] fields,Object config){
-
-
-        List<Value> values = new ArrayList<>();
-        List<Autowired> autowireds= new ArrayList<>();
-        for (Field field : fields) {
-            Value value = field.getAnnotation(Value.class);
-            if(value!= null){
-                values.add(value);
-            }else{
-                Autowired autowired = field.getAnnotation(Autowired.class);
-                if(autowired!= null)
-                    autowireds.add(autowired);
-            }
-        }
-
-        if(!values.isEmpty()){
-
-        }
-
-        if(!autowireds.isEmpty()){
-
-        }
-
-
-
-
-    }
-
 
 
     /**

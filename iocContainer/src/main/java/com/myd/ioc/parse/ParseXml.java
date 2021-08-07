@@ -1,5 +1,6 @@
 package com.myd.ioc.parse;
 
+import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.context.XmlConfiguration;
 import com.myd.ioc.beans.BeanDefinition;
 import com.myd.ioc.beans.PropertyValue;
@@ -12,6 +13,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import  org.apache.log4j.Logger;
@@ -42,7 +45,7 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         List<Element> elements = root.elements();
         for (Element element : elements) {
             String name = element.getName();//获取标签名；
-            XmlUtils.checkNodeName(name);
+            XmlUtils.checkRootNodeName(name);
             if(name.equals("bean")){//解析bean标签
                 parseBean(element, xmlConfiguration);
             }else if(name.equals("propertyPlaceholder")){//加载properties文件
@@ -50,6 +53,8 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
              }else if(name.equals("ComponentScan")){
                 //后续添加annotation解析;
                 xmlConfiguration.setAnnotationPackage(element.attributeValue("package"));
+            }else if(name.equals("aspect")){
+                aspectConfig(element);
             }
         }
         log.info("parse xml has end.....");
@@ -86,13 +91,11 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         for (Element property : properties) {//属性解析
             PropertyValue propertyValue = new PropertyValue();
             String name = property.getName();
-            XmlUtils.checkNodeName(name);
+            XmlUtils.checkBeanNodeName(name);
             if(name.equals("constructor")){
                 parseBeanProperty(property,propertyValue,beanDefinition.getConstructorValues());
-            }else if(name.equals("property")){
-                parseBeanProperty(property,propertyValue,beanDefinition.getPropertyValues());
             }else{
-                throw new XmlLabelNameError("标签：<"+name+" > 不能被用在 <bean>中");
+                parseBeanProperty(property,propertyValue,beanDefinition.getPropertyValues());
             }
 
         }
@@ -202,11 +205,52 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
             }
 
         }
+    }
 
 
+
+    public static void aspectConfig(Element aspect){
+        String id = aspect.attributeValue("id");
+        if(id == null || id.trim().length()==0)
+            throw new NullPointerException("aspect id is null error...");
+        AspectConfig aspectConfig = AspectConfig.getAspectConfig();
+        List<Element> elements = aspect.elements();
+        for (Element element : elements) {
+            String name = element.getName();
+            XmlUtils.checkAspectNodeName(name);
+            String pointcut = element.attributeValue("pointcut");
+            if(pointcut== null || pointcut.trim().length()==0)
+                throw new NullPointerException("aspect:"+id+","+name+" pointcut is null error...");
+//            aspectConfig.trim(pointcut)
+            String methodName = element.attributeValue("method");
+            if(methodName== null || methodName.trim().length()==0)
+                throw new NullPointerException("aspect:"+id+","+name+" method is null error...");
+            setAspectConfigValue(aspectConfig,name,pointcut,methodName);
+        }
 
     }
 
+
+
+
+    public static void setAspectConfigValue(AspectConfig aspectConfig,String name,String pointcut,String methodName)  {
+        String formatPointcut = aspectConfig.formatPointcut(pointcut);
+        Map<String,String> map = new HashMap<>();
+        map.put(formatPointcut,methodName.trim());
+        String setName = "set"+name.toUpperCase().charAt(0)+name.substring(1);
+        try {
+            Method method = aspectConfig.getClass().getMethod(setName,Map.class);
+            method.invoke(aspectConfig,map);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
 
 
 
