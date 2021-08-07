@@ -14,7 +14,7 @@
     <bean id="log" class="parse.Log"/>
 
     <aspect id="log">
-        <after  pointcut="execution(* parse.anno.component.*(..))" method="we"/>
+        <after  pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
        <!-- <before pointcut="" method=""/>
         <afterReturning pointcut="" method=""/>
         <afterThrowable pointcut="" method=""/>

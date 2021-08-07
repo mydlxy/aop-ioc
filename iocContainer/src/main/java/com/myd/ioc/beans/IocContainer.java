@@ -13,7 +13,7 @@ import java.util.*;
 
 public class IocContainer {
 
-    private Map<String,Object> beans = new HashMap<>(64);
+    private static Map<String,Object> beans = new HashMap<>(64);
     private static volatile IocContainer container;
     protected IocContainer(){}
     public static IocContainer container(){
@@ -39,7 +39,7 @@ public class IocContainer {
      * 这个方法提供给BeanPostAfterInitProcessor使用，用来处理iocContainer中需要aop的类；
      * @return
      */
-    protected  Map<String,Object> getBeans()
+    protected Map<String,Object> getBeans()
     {
         return beans;
     }
@@ -65,7 +65,6 @@ public class IocContainer {
         Collection<Object> values = beans.values();
 
         List<Object> findClass  = new ArrayList<>();
-
 
         //先找相同类型的object，
         for (Object value : values) {

@@ -4,6 +4,7 @@ import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.filter.MethodFilter;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 
 public class AfterAdvice implements Advice {
+    Logger log = Logger.getLogger(getClass());
     private String pointcut;
     private Method afterMethod;
     private Object aspect;
@@ -32,7 +34,12 @@ public class AfterAdvice implements Advice {
         Map<String,String> after = aspectConfig.getAfter();
         this.pointcut =  after.keySet().iterator().next();
         String methodName =  after.get(pointcut);
-        afterMethod = aspect.getClass().getMethod(methodName);
+        try {
+            afterMethod = aspect.getClass().getMethod(methodName);
+        }catch (NoSuchMethodException e){
+            log.debug("aspect not found method:"+methodName);
+            throw new NoSuchMethodException("aspect not found method:"+methodName);
+        }
     }
 
     @Override

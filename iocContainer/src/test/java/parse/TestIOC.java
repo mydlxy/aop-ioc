@@ -25,14 +25,18 @@ public class TestIOC {
     public void test() throws Exception {
         System.out.println(Teacher.class.getName());
         ApplicationContext context = new XmlApplicationContext("bean.xml");
-        Teacher t = context.getBean(Teacher.class);
-        User user = context.getBean(User.class);
-        System.out.println(user.toString());
-        System.out.println(user.getTeacher().toString());
-        System.out.println(t.toString());
-        System.out.println("===============================");
+//        Teacher t = context.getBean(Teacher.class);
+//        User user = context.getBean(User.class);
+//        System.out.println(user.toString());
+//        System.out.println(user.getTeacher().toString());
+//        System.out.println(t.toString());
+//        System.out.println("===============================");
 
 
+        System.out.println("**********aop****************");
+
+        Model model = context.getBean(Model.class);
+        model.getUser();
 
 
     }

@@ -48,7 +48,9 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
     public void initAdvice() throws NoSuchMethodException {
         aspectConfig = AspectConfig.getAspectConfig();
         String aspectId = aspectConfig.getId();
-        aspectConfig.setAspect(getBeans().get(aspectId));
+//        IocContainer.container().get
+        Object aspect  =getBeans().get(aspectId);
+        aspectConfig.setAspect(aspect);
         if(aspectConfig.getBefore()!=null)
             beforeAdvice = new BeforeAdvice();
         if(aspectConfig.getAfter()!= null)

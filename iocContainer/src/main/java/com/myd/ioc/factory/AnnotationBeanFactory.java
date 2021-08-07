@@ -76,7 +76,7 @@ public class AnnotationBeanFactory {
         if(classNames.isEmpty())return;
         for (String className : classNames) {
             Class beanClass = Class.forName(className);
-            Object bean = beanClass.newInstance();
+            Object bean = beanClass.newInstance();//因为前面已经处理过bean，这里必须生成一个bean就处理一个
             bean = beanPostProcess(bean);
             Component component = (Component) beanClass.getAnnotation(Component.class);
             if(component == null)continue;
@@ -184,7 +184,7 @@ public class AnnotationBeanFactory {
             List<Field> fields = map.get(id);
             for (Field field : fields) {
                 String typeName = field.getType().getTypeName();
-                log.debug(typeName);
+//                log.debug(typeName);
                 Object value = container.getBean(Class.forName(typeName));
                 ReflectUtils.setValue(bean,field,value);
             }

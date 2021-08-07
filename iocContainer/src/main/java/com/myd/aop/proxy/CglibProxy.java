@@ -42,12 +42,9 @@ public class CglibProxy implements MethodInterceptor {
 
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-
-
-
-        return  methodProxy.invokeSuper(o,objects);
-
-
-
+        if(advice.matchMethod(method))
+            return advice.intercept(o,method,objects,methodProxy);
+        else
+            return methodProxy.invokeSuper(o,objects);
     }
 }

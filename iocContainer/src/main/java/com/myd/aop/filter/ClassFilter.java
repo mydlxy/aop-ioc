@@ -78,7 +78,6 @@ public class ClassFilter {
      */
     public static String regexClass(String regex){
         regex  =regex.replaceAll("\\*","\\\\w*").replaceAll("\\.","\\\\.");
-        System.out.println(regex);
         if(regex.endsWith(".")){
             return regex+".*";
         }else if(regex.endsWith("\\.\\w*")){

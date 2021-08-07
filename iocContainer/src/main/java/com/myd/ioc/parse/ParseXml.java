@@ -213,7 +213,7 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         String id = aspect.attributeValue("id");
         if(id == null || id.trim().length()==0)
             throw new NullPointerException("aspect id is null error...");
-        AspectConfig aspectConfig = AspectConfig.getAspectConfig();
+        AspectConfig aspectConfig = AspectConfig.getAspectConfig().setId(id.trim());
         List<Element> elements = aspect.elements();
         for (Element element : elements) {
             String name = element.getName();
