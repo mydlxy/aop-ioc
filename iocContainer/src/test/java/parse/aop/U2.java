@@ -5,7 +5,12 @@ package parse.aop;
  * @date 2021/8/6  17:12
  */
 
-public class U2 implements T2,T{
+public class U2 implements T{
+    private String name;
+//    public String getName(){
+//        return name;
+//    }
+//
     public void t1(){
         System.out.println(getClass().getSimpleName()+";method=t1");
     }
@@ -20,7 +25,7 @@ public class U2 implements T2,T{
 
     public void t4(String arg){
         System.out.println("*******************************");
-        System.out.println("this method not aop");
+        System.out.println("this method not aop...."+name);
         System.out.println("*******************************");
     }
 

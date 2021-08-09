@@ -30,10 +30,6 @@ public class XmlApplicationContext implements ApplicationContext {
         if(xmlConfiguration.getAnnotationPackage()!= null){
             annotationApplicationContext = new AnnotationApplicationContext(xmlConfiguration.getAnnotationPackage(),xmlConfiguration);
         }
-//        if(AspectConfig.hasAspectConfig()){
-//            BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
-//            beanPostAfterInitProcessor.postProcessAllBean();
-//        }
 
 
 

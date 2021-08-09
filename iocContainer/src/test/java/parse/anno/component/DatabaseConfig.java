@@ -3,26 +3,30 @@ package parse.anno.component;
 import com.myd.ioc.annotations.Autowired;
 import com.myd.ioc.annotations.Component;
 import com.myd.ioc.annotations.Value;
+import parse.aop.T;
+import parse.aop.T2;
 import parse.model.User;
+
+import java.io.Serializable;
 
 /**
  * @author myd
  * @date 2021/8/1  16:52
  */
-@Component
-public class DatabaseConfig {
+@Component("qw")
+public class DatabaseConfig implements T2 {
 
-   @Autowired
+//   @Autowired
    private User user;//xml配置
-   @Autowired
+//   @Autowired
    private Model2 model2;//注解配置
-   @Value("${username}")
+   @Value("${username}")//@Value("${username}")
    private  String username;
-   @Value("url0000tooorrr")
+   @Value("${url}")
    private String url;
    @Value("${password}")
    private String password;
-    @Value("${driverClass}")
+    @Value("{driverClass}")
    private String driverClass;
 
     @Override
@@ -33,5 +37,10 @@ public class DatabaseConfig {
                 ", password='" + password + '\'' +
                 ", driverClass='" + driverClass + '\'' +
                 '}';
+    }
+
+    @Override
+    public void print() {
+        System.out.println("beanName:"+getClass().getName()+";"+toString());
     }
 }

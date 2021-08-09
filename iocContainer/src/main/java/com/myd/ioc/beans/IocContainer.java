@@ -66,15 +66,6 @@ public class IocContainer {
 
         List<Object> findClass  = new ArrayList<>();
 
-        //先找相同类型的object，
-        for (Object value : values) {
-            if(value.getClass().equals(beanClass))findClass.add(value);
-        }
-        if(findClass.size()==1)
-            return (T)findClass.get(0);
-        if(findClass.size()>1)
-            throw new RuntimeException("this classType has more than one ");
-
         //如果是cglib生成的类，那么该类的superClass是原生类;
         //如果是jdk动态代理生成，那么则是实现了原生类的interfaces
         for (Object value : values) {

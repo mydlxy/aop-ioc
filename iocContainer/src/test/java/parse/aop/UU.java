@@ -5,7 +5,8 @@ package parse.aop;
  * @date 2021/8/6  17:11
  */
 
-public class UU implements T2,T{
+public class UU implements T{
+
 
     public void t1(){
         System.out.println(getClass().getSimpleName()+";method=t1");

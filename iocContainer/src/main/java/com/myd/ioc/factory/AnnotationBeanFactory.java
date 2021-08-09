@@ -1,5 +1,6 @@
 package com.myd.ioc.factory;
 
+import com.myd.aop.AopUtils;
 import com.myd.aop.BeanPostAfterInitProcessor;
 import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.annotations.*;
@@ -14,7 +15,10 @@ import com.myd.ioc.utils.ReflectUtils;
 import com.myd.ioc.utils.RegexUtils;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -44,7 +48,7 @@ public class AnnotationBeanFactory {
     }
     //从xml文件中，获取到扫描的路径；xml + 注解 ：混合的配置bean
     //解析优先级： 解析xml > 解析注解
-    public AnnotationBeanFactory(String scanPackage, XmlConfiguration xmlConfiguration) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public AnnotationBeanFactory(String scanPackage, XmlConfiguration xmlConfiguration) throws IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, NoSuchFieldException {
         this.scanPackage = scanPackage;
         if(xmlConfiguration != null)
             this.propertiesMap.put(xmlConfiguration.getPropertiesPath(), xmlConfiguration.getProperties());
@@ -69,39 +73,116 @@ public class AnnotationBeanFactory {
      *
      * @param scanPackage
      */
-    public void registerBean(String scanPackage) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public void registerBean(String scanPackage) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, NoSuchFieldException {
 
         Map<String,List<Field>> temp = new HashMap<>();
         List<String> classNames = RegexUtils.scanClassNames(scanPackage);
         if(classNames.isEmpty())return;
+        Map<String,Object> scanBeans = new HashMap<>();
         for (String className : classNames) {
             Class beanClass = Class.forName(className);
-            Object bean = beanClass.newInstance();//因为前面已经处理过bean，这里必须生成一个bean就处理一个
-            bean = beanPostProcess(bean);
+            if(beanClass.isInterface())continue;
+            Object bean = beanClass.newInstance();
             Component component = (Component) beanClass.getAnnotation(Component.class);
             if(component == null)continue;
             String id = getComponentId(beanClass,component);
             List<Field> autowired = findFieldAnnotation(beanClass,Autowired.class);
             List<Field> values = findFieldAnnotation(beanClass, Value.class);
             injectValue(values,bean);
-            container.registerBean(id,bean);
+            scanBeans.put(id,bean);
             if(!autowired.isEmpty())
                 temp.put(id,autowired);
         }
-        if(temp.isEmpty())return;
-        injectAutowired(temp);
-    }
 
-    public Object beanPostProcess(Object target){
-        if(!AspectConfig.hasAspectConfig())return target;
-        try {
-            BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
-            return beanPostAfterInitProcessor.postProcessAfterInitialization(target);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+
+        if(scanBeans.isEmpty())return;
+        if( !AspectConfig.hasAspectConfig()){
+            registerBeanAndAOP(scanBeans);
+        }else{
+            registerBean(scanBeans);
         }
 
+
+        if(temp.isEmpty())return;
+        injectAutowired(temp);
+
+
+
+    }
+
+
+    public void registerBean(Map<String,Object> scanBeans){
+        for(Iterator<String> iter = scanBeans.keySet().iterator();iter.hasNext();){
+            String id = iter.next();
+            container.registerBean(id,scanBeans.get(id));
+        }
+
+
+    }
+
+
+
+    /**
+     *
+     * jdk代理生成的对象，被代理之后注解不会丢失（因为动态代理生成的代理对象，会持有原生类对象）
+     * 被JDK代理生成的类是Proxy的子类（被代理类的继承结构：BeanProxy  extends Proxy  implements Interface1,Interface2..）
+     * 而原生类的对象被注入到父类Proxy的一个字段：h；
+     * 因此jdk动态代理类，可以获取原生类的信息;
+     * 原生类:target
+     * 生成新对象：Proxy.newInstance(target.getClass(),target.getClass().getInterfaces(),this);
+     * BeanProxy beanProxy = new BeanProxy();
+     * beanProxy.super.h = target;
+     *
+     *
+     *
+     *
+     * cglib代理生成的对象，会丢失注解；代理类是原生类的子类，而字段注解会丢失；因此需要对注解的字段重新赋值；
+     * 原因：cglib代理的类会继承原生对象类，生成一个新对象；原生对象没有关联；
+     *  class A{}
+     * A target  = new A();
+     * target对象被cglib动态代理会生成一个新类:
+     * class A$$CGLIB$$ extends A{}
+     * 此时会生成一个新的对象：
+     * A$$CGLIB$$ cglibA  =new A$$CGLIB$$();
+     * 对象：cglibA与target没有关联，
+     *
+     * 为什么只对@Value的注解赋值而不对@Autowired注解的字段赋值？
+     *
+     * 因为采取的aop策略是先将注册在iocContainer容器中所有的类，根据配置的pointcut匹配过滤，筛选出所有需要aop的类；
+     * 将这些类全部动态代理之后，再来给被@Autowired注解的字段注入值，这样可以避免被autowired注解的字段注入的类被aop之后，还要再次更换值；
+     * e.g.
+     *
+     * 现在容器中有 A,B两个对象
+     * class A{
+     *
+     * @Autowired
+     * B b;
+     * }
+     * 如果在A被cglib动态代理之后，理解注入 B对象；
+     *
+     * 而B对象也会被 cglib代理，这样在B被代理之后，还需要更新 A中B对象的值；这样做显得有些愚蠢；
+     *
+     * 因此采用先将 容器中所有要被 aop的类，全部aop之后再来注入被@Autowired注解字的段值
+     *
+     *
+     *
+     *
+     * @param scanBeans
+     *
+     * @return
+     */
+    public void registerBeanAndAOP(Map<String,Object> scanBeans) throws IllegalAccessException, NoSuchMethodException {
+        BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
+        for(Iterator<String> iter = scanBeans.keySet().iterator();iter.hasNext();) {
+            String id = iter.next();
+            Object target = scanBeans.get(iter);
+            Object postBean = beanPostAfterInitProcessor.postProcessAfterInitialization(target);
+            List<Field> beanValue = AopUtils.getBeanValue(postBean.getClass());//获取@Value注解
+            if (postBean.getClass().getName().matches("(\\w+\\.)*\\w+\\$\\$EnhancerByCGLIB\\$\\$.*") && !beanValue.isEmpty()) {
+                injectValue(beanValue, postBean);//将@Value注解的值注入到字段中;
+            }
+            container.registerBean(id,target);
+        }
 
     }
 
@@ -140,7 +221,6 @@ public class AnnotationBeanFactory {
         }
     }
 
-
     public String getPropertiesValue(String key){
         String value = propertiesValues.get(key);
         if(value!= null)return value;
@@ -149,21 +229,18 @@ public class AnnotationBeanFactory {
 
     /**
      *
-     * 将解析的所有properties文件值合并
+     * 将解析的所有 properties 文件值合并
      *
      */
     public void mergeProperties(){
         Collection<Properties> values = propertiesMap.values();
         for (Properties value : values) {
-//            propertiesValues.
             for(Iterator iter = value.keySet().iterator();iter.hasNext();){
                 String next = (String)iter.next();
                 if(propertiesValues.containsKey(next)){
                      throw new PropertiesKeyRepeatError("properties key repeat:"+next);
                 }
                 propertiesValues.put(next,(String)value.get(next));
-
-
             }
 
         }
@@ -177,19 +254,20 @@ public class AnnotationBeanFactory {
      * 给使用了@Autowired注解的字段注入对象；
      *
      */
-    public void injectAutowired(Map<String,List<Field>> map) throws IllegalAccessException, ClassNotFoundException {
+    public void injectAutowired(Map<String,List<Field>> map) throws IllegalAccessException, ClassNotFoundException, NoSuchFieldException {
         for(Iterator<String> iterator = map.keySet().iterator();iterator.hasNext();){
             String id = iterator.next();
             Object bean = container.getBean(id);
             List<Field> fields = map.get(id);
-            for (Field field : fields) {
-                String typeName = field.getType().getTypeName();
-//                log.debug(typeName);
-                Object value = container.getBean(Class.forName(typeName));
-                ReflectUtils.setValue(bean,field,value);
-            }
+            AopUtils.injectAutowired(bean,fields);
         }
     }
+
+
+
+
+
+
 
 
 
@@ -211,7 +289,7 @@ public class AnnotationBeanFactory {
      * }
      * 
      * 要找User中所有带有@Autowired注解的字段
-     * 
+     * 没有aop可以这样找，有了aop就不行了；
      * findFieldAnnotation(User.class,Autowired.class)
      * ===> return model,teacher
      * 
@@ -232,6 +310,9 @@ public class AnnotationBeanFactory {
         }
         return fields;
     }
+
+
+
 
 
     /**

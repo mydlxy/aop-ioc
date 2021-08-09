@@ -10,7 +10,7 @@ import com.myd.ioc.factory.AnnotationBeanFactory;
 public class AnnotationApplicationContext implements ApplicationContext {
 
     private AnnotationBeanFactory annotationBeanFactory;
-    public AnnotationApplicationContext(String scanPackage, XmlConfiguration xmlConfiguration) throws IllegalAccessException, ClassNotFoundException, InstantiationException {
+    public AnnotationApplicationContext(String scanPackage, XmlConfiguration xmlConfiguration) throws IllegalAccessException, ClassNotFoundException, InstantiationException, NoSuchMethodException, NoSuchFieldException {
         this.annotationBeanFactory = new AnnotationBeanFactory(scanPackage, xmlConfiguration);
     }
 

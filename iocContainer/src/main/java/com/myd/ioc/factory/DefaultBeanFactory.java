@@ -1,5 +1,6 @@
 package com.myd.ioc.factory;
 
+import com.myd.aop.AopUtils;
 import com.myd.aop.BeanPostAfterInitProcessor;
 import com.myd.aop.config.AspectConfig;
 import com.myd.ioc.beans.BeanDefinition;
@@ -40,7 +41,7 @@ public class DefaultBeanFactory implements BeanFactory {
    private List<String> currentCreateBean = new ArrayList<>();
    private XmlConfiguration xmlConfiguration;
 
-   public DefaultBeanFactory(XmlConfiguration xmlConfiguration) throws ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException {
+   public DefaultBeanFactory(XmlConfiguration xmlConfiguration) throws ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
        this.xmlConfiguration = xmlConfiguration;
        this.container = IocContainer.container();
        createBeans(xmlConfiguration.getBeanDefinitions().values());
@@ -53,21 +54,20 @@ public class DefaultBeanFactory implements BeanFactory {
    public <T>T getBean(Class beanClass){
        return container.getBean(beanClass);
    }
-   public void createBeans(Collection<BeanDefinition> beanDefinitions) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+   public void createBeans(Collection<BeanDefinition> beanDefinitions) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
        for (BeanDefinition beanDefinition : beanDefinitions) {
            createBean(beanDefinition);
        }
-       //在生成完bean之后，再检查class是否需要aop
-       if(AspectConfig.hasAspectConfig()){
-           try {
-               BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
-               beanPostAfterInitProcessor.postProcessAllBean();
-           } catch (NoSuchMethodException e) {
-               e.printStackTrace();
-               throw new RuntimeException(e);
+       if( !AspectConfig.hasAspectConfig()){
+           BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
+           for (BeanDefinition beanDefinition : beanDefinitions) {
+               Object bean = container.getBean(beanDefinition.getId());
+               beanPostAfterInitProcessor.postProcessAfterInitialization(bean);
+               beanPostAfterInitProcessor.iocContainer().put(beanDefinition.getId(),bean);
            }
-
        }
+
+
 
        for (BeanDefinition beanDefinition : beanDefinitions) {
            Object bean = container.getBean(beanDefinition.getId());
@@ -98,12 +98,6 @@ public class DefaultBeanFactory implements BeanFactory {
         currentCreateBean.remove(className);
         return (T)bean;
     }
-
-    public void registerBean(String id,Object bean){
-
-
-    }
-
 
     /**
      *
@@ -146,12 +140,17 @@ public class DefaultBeanFactory implements BeanFactory {
      * @param beanDefinition
      * @param bean
      */
-    public void assembleBean(BeanDefinition beanDefinition,Object bean) throws NoSuchFieldException, IllegalAccessException {
+    public void assembleBean(BeanDefinition beanDefinition,Object bean) throws NoSuchFieldException, IllegalAccessException, ClassNotFoundException {
         List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
         Class<?> beanClass = bean.getClass();
+        if(beanClass.getName().matches("(\\w+\\.)*\\w+\\$\\$EnhancerByCGLIB\\$\\$.*")){
+            beanClass = beanClass.getSuperclass();
+        }else if(beanClass.getName().matches("com\\.sun\\.proxy\\.\\$Proxy.*")){
+            bean = AopUtils.findJdkTarget(bean);
+        }
         for (PropertyValue propertyValue : propertyValues) {
             String fieldName = propertyValue.getPropertyName();
-            String value = propertyValue.getValue();
+            String value = propertyValue.getValue();//ref值
             Field field=beanClass.getDeclaredField(fieldName);
             field.setAccessible(true);
             if(propertyValue.isRef()){

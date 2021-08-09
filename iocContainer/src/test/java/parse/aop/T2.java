@@ -6,4 +6,6 @@ package parse.aop;
  */
 
 public interface T2 {
+
+    void print();
 }

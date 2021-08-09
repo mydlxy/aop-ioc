@@ -15,10 +15,12 @@
 
     <aspect id="log">
         <after  pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
-       <!-- <before pointcut="" method=""/>
-        <afterReturning pointcut="" method=""/>
-        <afterThrowable pointcut="" method=""/>
-        <around pointcut="" method=""/>-->
+        <before pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
+        <afterReturning pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
+        <afterThrowable pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
+<!--
+        <around pointcut="execution(* parse.anno.component.*(..))" method="beforeTest"/>
+-->
     </aspect>
 
 

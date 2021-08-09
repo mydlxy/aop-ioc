@@ -7,10 +7,13 @@ import com.myd.ioc.utils.RegexUtils;
 import org.junit.jupiter.api.Test;
 import parse.anno.component.DatabaseConfig;
 import parse.anno.component.Model;
+import parse.aop.T2;
 import parse.model.Teacher;
 import parse.model.User;
 
 import java.io.File;
+import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +35,23 @@ public class TestIOC {
 //        System.out.println(t.toString());
 //        System.out.println("===============================");
 
+//        Serializable config =context.getBean(Serializable.class);
 
         System.out.println("**********aop****************");
 
-        Model model = context.getBean(Model.class);
-        model.getUser();
+        T2 model = context.getBean(T2.class);
+
+//        Model bean = context.getBean(Model.class);
+
+        System.out.println(context.getBean(Model.class).toString());
+//        for (Field f : bean.getClass().getDeclaredFields()) {
+//            System.out.println(f.getName());
+//        }
+//        System.out.println("beanName:"+bean.getClass().getName()+";"+bean.toString());
+        model.print();
+        System.out.println(model.getClass().getName());
+
+//        model.getUser();
 
 
     }

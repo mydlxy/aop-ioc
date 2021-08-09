@@ -2,6 +2,7 @@ package com.myd.aop.proxy;
 
 import com.myd.aop.advice.Advice;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -26,6 +27,12 @@ public class JDKProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        //测试时，临时添加；fuck
+        if(advice == null){
+//            System.out.println("sdf");
+            return method.invoke(target,args);
+        }
+
         if(advice.matchMethod(method))
             return advice.invoke(proxy,method,args,target);
         else

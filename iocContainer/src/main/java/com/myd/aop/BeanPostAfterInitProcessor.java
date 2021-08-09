@@ -65,6 +65,9 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
 
 
 
+    public Map<String, Object> iocContainer(){
+        return getBeans();
+    }
 
     public void postProcessAllBean(){
         Map<String, Object> beans = getBeans();
@@ -100,7 +103,8 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
                 return beanPostProcess(bean,aroundAdvice);
             }
             if(beforeAdvice != null && beforeAdvice.matchClass(primitBean)){
-                bean = beanPostProcess(bean,beforeAdvice);
+//                bean = beanPostProcess(bean,beforeAdvice);
+                return beanPostProcess(bean,beforeAdvice);
             }
 
             if(afterAdvice != null && afterAdvice.matchClass(primitBean)){
@@ -108,8 +112,10 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
             }
 
             if(afterReturningAdvice != null && afterReturningAdvice.matchClass(primitBean)){
-                bean = beanPostProcess(bean,afterReturningAdvice);
+//                bean = beanPostProcess(bean,afterReturningAdvice);
+                return beanPostProcess(bean,afterReturningAdvice);
             }
+
 
             if(afterThrowableAdvice != null && afterThrowableAdvice.matchClass(primitBean)){
                 return beanPostProcess(bean,afterThrowableAdvice);

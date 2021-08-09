@@ -3,6 +3,7 @@ package parse;
 import com.myd.ioc.parse.ParseXml;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
@@ -15,7 +16,20 @@ import java.util.*;
 public class TestParameters {
 
 
+    public String gg;
+    public String gg2;
 
+    @Test
+    public void testField(){
+        Field[] fields = TestParameters.class.getFields();
+        for (Field field : fields) {
+            System.out.println(field.getType().getName());
+            System.out.println(field.getName());
+            System.out.println(field.toGenericString());
+        }
+    }
+
+    @Test
     public void testArray(Integer[] a,boolean b){
 
         System.out.println(a.length);

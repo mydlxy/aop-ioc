@@ -10,7 +10,7 @@ import com.myd.ioc.annotations.Component;
 @Component
 public class Model2 {
 
-    @Autowired
+//    @Autowired
     private Model model;
 
 
