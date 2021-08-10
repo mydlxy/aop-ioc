@@ -1,10 +1,12 @@
 package com.myd.aop.advice;
 
+import com.myd.aop.AdviceType;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.filter.MethodFilter;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -18,6 +20,12 @@ public class AfterThrowableAdvice implements Advice{
     private String pointcut;
     private Method afterThrowableMethod;
     private Object aspect;
+
+    public  AfterThrowableAdvice(String pointcut,Object aspect,Method afterThrowableMethod){
+        this.pointcut = pointcut;
+        this.aspect = aspect;
+        this.afterThrowableMethod = afterThrowableMethod;
+    }
 
     public AfterThrowableAdvice() throws NoSuchMethodException {
         init();
@@ -33,8 +41,13 @@ public class AfterThrowableAdvice implements Advice{
 
 
     @Override
-    public boolean supportsAdvice(Advice advice) {
-        return advice instanceof AfterThrowableAdvice;
+    public AdviceType getType() {
+        return AdviceType.AfterThrowable;
+    }
+
+    @Override
+    public void advice() throws InvocationTargetException, IllegalAccessException {
+        afterThrowableMethod.invoke(aspect,null);
     }
 
     @Override
@@ -47,25 +60,4 @@ public class AfterThrowableAdvice implements Advice{
         return  ClassFilter.matchClass(bean,pointcut);
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args, Object target) throws Throwable {
-
-       try{
-           return method.invoke(target,args);
-       }catch (Exception e){
-           afterThrowableMethod.invoke(aspect,null);
-           throw new Throwable(e);
-       }
-    }
-
-    @Override
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        try{
-            return methodProxy.invokeSuper(o,objects);
-        }catch (Exception e){
-            afterThrowableMethod.invoke(aspect,null);
-            throw new Throwable(e);
-        }
-
-    }
 }

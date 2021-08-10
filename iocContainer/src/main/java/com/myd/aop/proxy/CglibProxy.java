@@ -1,12 +1,15 @@
 package com.myd.aop.proxy;
 
+import com.myd.aop.AdviceType;
+import com.myd.aop.AopUtils;
 import com.myd.aop.advice.Advice;
-import net.sf.cglib.beans.BeanGenerator;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author myd
@@ -17,11 +20,11 @@ public class CglibProxy implements MethodInterceptor {
 
     private Object target;
 
-    private Advice advice;
+    private List<Advice> advices;
 
-    public CglibProxy(Object target,Advice advice){
+    public CglibProxy(Object target,List<Advice> advices){
         this.target = target;
-        this.advice = advice;
+        this.advices = advices;
     }
 
 
@@ -42,14 +45,48 @@ public class CglibProxy implements MethodInterceptor {
 
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-      //临时添加，用于测试；记得删除
-        if(advice == null)
-            return methodProxy.invokeSuper(o,objects);
 
+        Object returnVal;
+        boolean exeFinally=true;
+        try {
+            if(!exeAdvice(method, AdviceType.Around)){
+                exeAdvice(method,AdviceType.Before);
+            }
 
-        if(advice.matchMethod(method))
-            return advice.intercept(o,method,objects,methodProxy);
-        else
-            return methodProxy.invokeSuper(o,objects);
+            returnVal = methodProxy.invokeSuper(o, objects);
+
+            if(exeAdvice(method,AdviceType.Around)){
+                exeFinally=false;
+            }else{
+                if(exeAdvice(method,AdviceType.AfterReturning))
+                    exeFinally=false;
+            }
+        }catch(Throwable e){
+            if(exeAdvice(method,AdviceType.Around)){
+                exeFinally=false;
+            }else{
+                if(exeAdvice(method,AdviceType.AfterThrowable))
+                    exeFinally=false;
+            }
+            throw new Throwable(e);
+        }finally {
+            if(exeFinally)
+                exeAdvice(method,AdviceType.After);
+        }
+        return returnVal;
+
+    }
+
+    public boolean exeAdvice(Method method,AdviceType type) throws InvocationTargetException, IllegalAccessException {
+
+        boolean exeAdvice=false;
+        if(AopUtils.containAdvice(type,advices) ){
+            Advice advice = AopUtils.getAdvice(type,advices);
+            exeAdvice = advice.matchMethod(method);
+            if(exeAdvice)
+                advice.advice();
+        }
+        return exeAdvice;
+
     }
 }

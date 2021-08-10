@@ -1,10 +1,12 @@
 package com.myd.aop.advice;
 
+import com.myd.aop.AdviceType;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.filter.MethodFilter;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -33,10 +35,18 @@ public class AroundAdvice implements Advice {
 
 
 
+
+
     @Override
-    public boolean supportsAdvice(Advice advice) {
-        return advice instanceof AroundAdvice;
+    public AdviceType getType() {
+        return AdviceType.Around;
     }
+
+    @Override
+    public void advice() throws InvocationTargetException, IllegalAccessException {
+            aroundMethod.invoke(aspect,null);
+    }
+
 
     @Override
     public boolean matchMethod(Method method) {
@@ -49,33 +59,4 @@ public class AroundAdvice implements Advice {
     }
 
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args, Object target) throws Throwable {
-
-        Object returnVal;
-        try{
-            aroundMethod.invoke(aspect,null);
-            returnVal = method.invoke(target,args);
-            aroundMethod.invoke(aspect,null);
-        }catch (Exception e){
-            aroundMethod.invoke(aspect,null);
-            throw new Exception(e);
-        }
-        return returnVal;
-    }
-
-    @Override
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        Object returnVal;
-        try{
-            aroundMethod.invoke(aspect,null);
-            returnVal = methodProxy.invokeSuper(o,objects);
-            aroundMethod.invoke(aspect,null);
-        }catch (Exception e){
-            aroundMethod.invoke(aspect,null);
-            throw new Exception(e);
-        }
-        return returnVal;
-
-    }
 }

@@ -1,7 +1,9 @@
 package com.myd.aop.advice;
 
+import com.myd.aop.AdviceType;
 import net.sf.cglib.proxy.MethodProxy;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -11,15 +13,13 @@ import java.lang.reflect.Method;
 
 public interface Advice {
 
-    boolean supportsAdvice(Advice advice);
 
-    public boolean matchMethod(Method method);
+    AdviceType getType();
 
-    public boolean matchClass(Object bean);
+    void advice() throws InvocationTargetException, IllegalAccessException;
 
-    Object invoke(Object proxy, Method method, Object[] args,Object target) throws Throwable;
+    boolean matchMethod(Method method);
 
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable ;
-
+    boolean matchClass(Object bean);
 
     }

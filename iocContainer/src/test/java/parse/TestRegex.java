@@ -138,7 +138,7 @@ public class TestRegex {
         U2 u2 = new U2();
 
         if(ClassFilter.matchClass(u2,exe)) {
-            JDKProxy jdkProxy = new JDKProxy(u2, new BeforeAdvice());
+            JDKProxy jdkProxy = new JDKProxy(u2, null);
             T t = jdkProxy.newInstance();
             t.t1();
             t.t2();

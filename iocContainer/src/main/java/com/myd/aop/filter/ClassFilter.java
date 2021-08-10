@@ -81,7 +81,7 @@ public class ClassFilter {
         if(regex.endsWith(".")){
             return regex+".*";
         }else if(regex.endsWith("\\.\\w*")){
-           return regex;
+            return regex;
         }
         return regex+"(\\.\\w+)?";
     }

@@ -16,9 +16,9 @@ import java.io.Serializable;
 @Component("qw")
 public class DatabaseConfig implements T2 {
 
-//   @Autowired
+   @Autowired
    private User user;//xml配置
-//   @Autowired
+   @Autowired
    private Model2 model2;//注解配置
    @Value("${username}")//@Value("${username}")
    private  String username;

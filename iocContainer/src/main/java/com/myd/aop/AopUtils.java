@@ -1,10 +1,13 @@
 package com.myd.aop;
 
+import com.myd.aop.advice.Advice;
 import com.myd.ioc.annotations.Value;
 import com.myd.ioc.beans.IocContainer;
 import com.myd.ioc.utils.ReflectUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,6 +107,22 @@ public class AopUtils {
             ReflectUtils.setValue(bean,field,value);
         }
     }
+
+
+    public static boolean containAdvice(AdviceType type, List<Advice> advices){
+        for ( Advice advice : advices) {
+            if(advice.getType().equals(type))return true;
+        }
+        return false;
+    }
+
+    public static Advice getAdvice(AdviceType type, List<Advice> advices){
+        for (final Advice advice : advices) {
+            if(advice.getType().equals(type))return advice;
+        }
+        return null;
+    }
+
 
 
 

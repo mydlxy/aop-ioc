@@ -6,9 +6,7 @@ import com.myd.aop.proxy.CglibProxy;
 import com.myd.aop.proxy.JDKProxy;
 import com.myd.ioc.beans.IocContainer;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author myd
@@ -46,9 +44,9 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
     }
 
     public void initAdvice() throws NoSuchMethodException {
+        if(!AspectConfig.hasAspectConfig())return;
         aspectConfig = AspectConfig.getAspectConfig();
         String aspectId = aspectConfig.getId();
-//        IocContainer.container().get
         Object aspect  =getBeans().get(aspectId);
         aspectConfig.setAspect(aspect);
         if(aspectConfig.getBefore()!=null)
@@ -98,31 +96,11 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
 
     @Override
     public Object postProcessAfterInitialization(Object bean) {
-        Object primitBean = bean;
-            if(aroundAdvice != null && aroundAdvice.matchClass(primitBean)){
-                return beanPostProcess(bean,aroundAdvice);
-            }
-            if(beforeAdvice != null && beforeAdvice.matchClass(primitBean)){
-//                bean = beanPostProcess(bean,beforeAdvice);
-                return beanPostProcess(bean,beforeAdvice);
-            }
-
-            if(afterAdvice != null && afterAdvice.matchClass(primitBean)){
-                return beanPostProcess(bean,afterAdvice);
-            }
-
-            if(afterReturningAdvice != null && afterReturningAdvice.matchClass(primitBean)){
-//                bean = beanPostProcess(bean,afterReturningAdvice);
-                return beanPostProcess(bean,afterReturningAdvice);
-            }
-
-
-            if(afterThrowableAdvice != null && afterThrowableAdvice.matchClass(primitBean)){
-                return beanPostProcess(bean,afterThrowableAdvice);
-            }
-        return bean;
+        List<Advice> advices = matchAdvice(bean);
+        if(advices.isEmpty())return bean;
+        return beanPostProcess(bean,advices);
     }
-    public Object beanPostProcess(Object bean,Advice advice){
+    public Object beanPostProcess(Object bean,List<Advice> advice){
 
         if(bean.getClass().getInterfaces().length==0){//bean没有实现接口，cglib代理
             CglibProxy cglibProxy = new CglibProxy(bean,advice);
@@ -132,6 +110,29 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
             return jdkProxy.newInstance();
         }
     }
+
+
+    public List<Advice> matchAdvice(Object bean){
+        List<Advice> advices = new ArrayList<>();
+        if(aroundAdvice != null && aroundAdvice.matchClass(bean)){
+            advices.add(aroundAdvice);
+        }
+        if(beforeAdvice != null && beforeAdvice.matchClass(bean)){
+            advices.add(beforeAdvice);
+        }
+        if(afterAdvice != null && afterAdvice.matchClass(bean)){
+            advices.add(afterAdvice);
+        }
+        if(afterReturningAdvice != null && afterReturningAdvice.matchClass(bean)){
+            advices.add(afterReturningAdvice);
+        }
+        if(afterThrowableAdvice != null && afterThrowableAdvice.matchClass(bean)){
+            advices.add(afterThrowableAdvice);
+        }
+
+        return advices;
+    }
+
 
 
 }

@@ -1,11 +1,13 @@
 package com.myd.aop.proxy;
 
+import com.myd.aop.AdviceType;
+import com.myd.aop.AopUtils;
 import com.myd.aop.advice.Advice;
-
-import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * @author myd
@@ -15,9 +17,9 @@ import java.lang.reflect.Proxy;
 public class JDKProxy implements InvocationHandler {
 
     private Object target;//目标类
-    private Advice advice;
-    public JDKProxy(Object target,Advice advice){
-        this.advice = advice;
+    private List<Advice> advices;
+    public JDKProxy(Object target,List<Advice> advices){
+        this.advices = advices;
         this.target = target;
     }
 
@@ -27,17 +29,57 @@ public class JDKProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //测试时，临时添加；fuck
-        if(advice == null){
-//            System.out.println("sdf");
-            return method.invoke(target,args);
-        }
+        //测试时，临时添加；
+//        if(advice == null){
+//            return method.invoke(target,args);
+//        }
 
-        if(advice.matchMethod(method))
-            return advice.invoke(proxy,method,args,target);
-        else
-            return method.invoke(target,args);
+        Object returnVal;
+        boolean exeFinally=true;
+        try {
+            if(!exeAdvice(method, AdviceType.Around)){
+                exeAdvice(method,AdviceType.Before);
+            }
+
+            returnVal =  method.invoke(target,args);
+
+            if(exeAdvice(method,AdviceType.Around )){
+                exeFinally=false;
+            }else{
+                if(exeAdvice(method,AdviceType.AfterReturning))
+                    exeFinally=false;
+            }
+        }catch(Throwable e){
+            if(exeAdvice(method,AdviceType.Around)){
+                exeFinally=false;
+            }else{
+                if(exeAdvice(method,AdviceType.AfterThrowable))
+                    exeFinally=false;
+            }
+            throw new Throwable(e);
+        }finally {
+            if(exeFinally)
+                exeAdvice(method,AdviceType.After);
+        }
+        return returnVal;
+
     }
+
+
+
+
+    public boolean exeAdvice(Method method, AdviceType type) throws InvocationTargetException, IllegalAccessException {
+        boolean exeAdvice=false;
+        if(AopUtils.containAdvice(type,advices) ){
+            Advice advice = AopUtils.getAdvice(type,advices);
+            exeAdvice = advice.matchMethod(method);
+            if(exeAdvice)
+                advice.advice();
+        }
+        return exeAdvice;
+
+    }
+
 
 
 }

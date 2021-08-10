@@ -1,5 +1,6 @@
 package com.myd.aop.advice;
 
+import com.myd.aop.AdviceType;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.filter.MethodFilter;
@@ -7,6 +8,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -49,22 +51,15 @@ public class BeforeAdvice implements Advice {
 
 
     @Override
-    public boolean supportsAdvice(Advice advice) {
-        return advice instanceof BeforeAdvice;
+    public AdviceType getType() {
+        return AdviceType.Before;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args,Object target) throws Throwable {
-        beforeMethod.invoke(aspect,null);
-        return method.invoke(target,args);
+    public void advice() throws InvocationTargetException, IllegalAccessException {
+            beforeMethod.invoke(aspect,null);
     }
 
-    @Override
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        beforeMethod.invoke(aspect,null);
-        return methodProxy.invokeSuper(o,objects);
-
-    }
 
 
 }

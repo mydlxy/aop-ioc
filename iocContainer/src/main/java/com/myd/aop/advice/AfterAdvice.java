@@ -1,13 +1,16 @@
 package com.myd.aop.advice;
 
+import com.myd.aop.AdviceType;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.filter.MethodFilter;
 import net.sf.cglib.proxy.MethodProxy;
 import org.apache.log4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Spliterator;
 
 /**
  * @author myd
@@ -20,10 +23,14 @@ public class AfterAdvice implements Advice {
     private Method afterMethod;
     private Object aspect;
 
-    @Override
-    public boolean supportsAdvice(Advice advice) {
-        return advice instanceof AfterAdvice;
+    public  AfterAdvice(String pointcut,Object aspect,Method afterMethod){
+        this.pointcut = pointcut;
+        this.aspect = aspect;
+        this.afterMethod = afterMethod;
     }
+
+
+
     public AfterAdvice()throws NoSuchMethodException {
         init();
     }
@@ -43,6 +50,17 @@ public class AfterAdvice implements Advice {
     }
 
     @Override
+    public AdviceType getType() {
+        return AdviceType.After;
+    }
+
+    @Override
+    public void advice() throws InvocationTargetException, IllegalAccessException {
+        afterMethod.invoke(aspect,null);
+
+    }
+
+    @Override
     public boolean matchMethod(Method method) {
         return MethodFilter.matchMethod(method,pointcut);
     }
@@ -52,44 +70,5 @@ public class AfterAdvice implements Advice {
         return ClassFilter.matchClass(bean,pointcut);
     }
 
-    /**
-     * JDKProxy
-     *
-     * @param proxy
-     * @param method
-     * @param args
-     * @param target
-     * @return
-     * @throws Throwable
-     */
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args, Object target) throws Throwable {
 
-        try{
-            return method.invoke(target,args);
-        }finally {
-            afterMethod.invoke(aspect,null);
-        }
-
-    }
-
-    /**
-     *
-     *
-     * cglibProxy
-     * @param o
-     * @param method
-     * @param objects
-     * @param methodProxy
-     * @return
-     * @throws Throwable
-     */
-    @Override
-    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-        try{
-            return  methodProxy.invokeSuper(o,objects);
-        }finally {
-            afterMethod.invoke(aspect,null);
-        }
-    }
 }
