@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 
 @Component("mmm")
-public class Model implements Serializable {
+public class Model  {
 
     @Autowired
     private User user;

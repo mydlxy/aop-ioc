@@ -6,6 +6,7 @@ import com.myd.ioc.parse.ParseXml;
 import com.myd.ioc.utils.RegexUtils;
 import org.junit.jupiter.api.Test;
 import parse.anno.component.DatabaseConfig;
+import parse.anno.component.ModeImpl;
 import parse.anno.component.Model;
 import parse.aop.T2;
 import parse.model.Teacher;
@@ -39,21 +40,24 @@ public class TestIOC {
 
         System.out.println("**********aop****************");
 
-        T2 model = context.getBean(T2.class);
+        Model model = context.getBean(Model.class);
 
 //        Model bean = context.getBean(Model.class);
 
         System.out.println(context.getBean(Model.class).toString());
-//        for (Field f : bean.getClass().getDeclaredFields()) {
-//            System.out.println(f.getName());
-//        }
-//        System.out.println("beanName:"+bean.getClass().getName()+";"+bean.toString());
-        model.print();
         System.out.println(model.getClass().getName());
 
 //        model.getUser();
 
 
+    }
+    @Test
+    public void test45() throws Exception {
+        ApplicationContext context = new XmlApplicationContext("bean.xml");
+        T2 t = context.getBean(T2.class);
+//        System.out.println(t.getClass().getName());
+        Model model  = context.getBean("modeImpl");
+        System.out.println(model.toString());
     }
 
     @Test
