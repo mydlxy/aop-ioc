@@ -22,6 +22,7 @@
 -->判断是否有 ComponentScan标签？有，则去扫描对应路径下的@Component，将其注入到容器
 
 ## 测试
-测试类：TestIOC
-
+测试类：TestIOC</br>
+相关博客：
+[pointcut正则表达式](https://blog.csdn.net/m0_37550986/article/details/119384659?spm=1001.2014.3001.5501)
 
