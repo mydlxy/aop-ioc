@@ -26,4 +26,5 @@
 
 ## 相关博客
 [pointcut正则表达式](https://blog.csdn.net/m0_37550986/article/details/119384659?spm=1001.2014.3001.5501)</br>
+[cglib注解丢失问题](https://blog.csdn.net/m0_37550986/article/details/119585988)
 
