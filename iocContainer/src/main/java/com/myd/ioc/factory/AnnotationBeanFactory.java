@@ -86,8 +86,8 @@ public class AnnotationBeanFactory {
             Component component = (Component) beanClass.getAnnotation(Component.class);
             if(component == null)continue;
             String id = getComponentId(beanClass,component);
-            List<Field> autowired = findFieldAnnotation(beanClass,Autowired.class);
-            List<Field> values = findFieldAnnotation(beanClass, Value.class);
+            List<Field> autowired = AopUtils.findFieldAnnotation(beanClass,Autowired.class);
+            List<Field> values = AopUtils.findFieldAnnotation(beanClass, Value.class);
             injectValue(values,bean);
             scanBeans.put(id,bean);
             if(!autowired.isEmpty())

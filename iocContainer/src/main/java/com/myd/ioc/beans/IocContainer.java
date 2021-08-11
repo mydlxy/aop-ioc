@@ -67,18 +67,17 @@ public class IocContainer {
         List<Object> findClass  = new ArrayList<>();
 
         //如果是cglib生成的类，那么该类的superClass是原生类;
-        //如果是jdk动态代理生成，那么则是实现了原生类的interfaces
         for (Object value : values) {
             if(beanClass.isInstance(value))
                 findClass.add(value);
         }
         if(findClass.size()==0)
-            throw new NullPointerException("class type: "+beanClass.getName()+" is not defined in the container.");
+            throw new NullPointerException(beanClass.getName()+" :is not defined in the container.");
 
         if(findClass.size()==1)
             return (T)findClass.get(0);
 
-        throw new RuntimeException("this classType has more than one ");
+        throw new RuntimeException(beanClass.getName()+" :this classType has more than one ");
 
     }
 

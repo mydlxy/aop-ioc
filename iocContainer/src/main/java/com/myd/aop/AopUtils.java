@@ -5,6 +5,7 @@ import com.myd.ioc.annotations.Value;
 import com.myd.ioc.beans.IocContainer;
 import com.myd.ioc.utils.ReflectUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,26 +19,6 @@ import java.util.List;
 
 public class AopUtils {
 
-
-    /**
-     *
-     * 设置字段中有@Value注解的字段
-     *
-     * @param bean
-     */
-    public static void setCglibFieldsValue(Object bean){
-        List<Field> beanValue = getBeanValue(bean.getClass());
-        for (final Field field : beanValue) {
-            field.setAccessible(true);
-            String value = field.getAnnotation(Value.class).value();
-
-
-
-
-        }
-
-
-    }
 
 
     /**
@@ -53,16 +34,34 @@ public class AopUtils {
             field.setAccessible(true);
             Value value = field.getAnnotation(Value.class);
             if(value == null)continue;
-            System.out.println(field.getClass());
             values.add(field);
         }
-        if(values.isEmpty() &&
-           bean.getSuperclass() != null  &&
+        if(bean.getSuperclass() != null  &&
            !bean.getSuperclass().equals(Object.class)){
            return getBeanValue(bean.getSuperclass());
         }
          return values;
     }
+
+
+
+    public static List<Field> findFieldAnnotation(Class bean,Class AnnotationType){
+        List<Field> values =new ArrayList<>();
+        Field[] fields = bean.getDeclaredFields();
+        for (final Field field : fields) {
+            field.setAccessible(true);
+            Annotation value = field.getAnnotation(AnnotationType);
+            if(value == null)continue;
+//            System.out.println(field.getClass());
+            values.add(field);
+        }
+        if(bean.getSuperclass() != null  &&
+                !bean.getSuperclass().equals(Object.class)){
+            return findFieldAnnotation(bean.getSuperclass(),AnnotationType);
+        }
+        return values;
+    }
+
 
 
     /**
