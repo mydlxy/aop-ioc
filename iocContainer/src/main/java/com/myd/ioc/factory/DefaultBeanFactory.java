@@ -58,12 +58,12 @@ public class DefaultBeanFactory implements BeanFactory {
        for (BeanDefinition beanDefinition : beanDefinitions) {
            createBean(beanDefinition);
        }
-       if( !AspectConfig.hasAspectConfig()){
+       if(AspectConfig.hasAspectConfig()){
            BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
            for (BeanDefinition beanDefinition : beanDefinitions) {
                Object bean = container.getBean(beanDefinition.getId());
-               beanPostAfterInitProcessor.postProcessAfterInitialization(bean);
-               beanPostAfterInitProcessor.iocContainer().put(beanDefinition.getId(),bean);
+               Object postBean = beanPostAfterInitProcessor.postProcessAfterInitialization(bean);
+               beanPostAfterInitProcessor.iocContainer().put(beanDefinition.getId(),postBean);
            }
        }
 

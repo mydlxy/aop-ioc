@@ -30,10 +30,6 @@ public class JDKProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //测试时，临时添加；
-//        if(advice == null){
-//            return method.invoke(target,args);
-//        }
-
         Object returnVal;
         boolean exeFinally=true;
         try {

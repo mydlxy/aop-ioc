@@ -67,18 +67,18 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
         return getBeans();
     }
 
-    public void postProcessAllBean(){
-        Map<String, Object> beans = getBeans();
-        String aspectId = aspectConfig.getId();
-        for(Iterator<String> iter= beans.keySet().iterator();iter.hasNext();){
-            String key = iter.next();
-            if(key.equals(aspectId))continue;
-            Object bean = beans.get(key);
-            Object postBean = postProcessAfterInitialization(bean);
-            if(bean != postBean)
-                beans.put(key,postBean);
-        }
-    }
+//    public void postProcessAllBean(){
+//        Map<String, Object> beans = getBeans();
+//        String aspectId = aspectConfig.getId();
+//        for(Iterator<String> iter= beans.keySet().iterator();iter.hasNext();){
+//            String key = iter.next();
+//            if(key.equals(aspectId))continue;
+//            Object bean = beans.get(key);
+//            Object postBean = postProcessAfterInitialization(bean);
+//            if(bean != postBean)
+//                beans.put(key,postBean);
+//        }
+//    }
 
 
 

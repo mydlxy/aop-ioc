@@ -96,7 +96,7 @@ public class AnnotationBeanFactory {
 
 
         if(scanBeans.isEmpty())return;
-        if( !AspectConfig.hasAspectConfig()){
+        if(AspectConfig.hasAspectConfig()){
             registerBeanAndAOP(scanBeans);
         }else{
             registerBean(scanBeans);
@@ -175,13 +175,13 @@ public class AnnotationBeanFactory {
         BeanPostAfterInitProcessor beanPostAfterInitProcessor = BeanPostAfterInitProcessor.getBeanPostAfterInitProcessor();
         for(Iterator<String> iter = scanBeans.keySet().iterator();iter.hasNext();) {
             String id = iter.next();
-            Object target = scanBeans.get(iter);
+            Object target = scanBeans.get(id);
             Object postBean = beanPostAfterInitProcessor.postProcessAfterInitialization(target);
             List<Field> beanValue = AopUtils.getBeanValue(postBean.getClass());//获取@Value注解
             if (postBean.getClass().getName().matches("(\\w+\\.)*\\w+\\$\\$EnhancerByCGLIB\\$\\$.*") && !beanValue.isEmpty()) {
                 injectValue(beanValue, postBean);//将@Value注解的值注入到字段中;
             }
-            container.registerBean(id,target);
+            container.registerBean(id,postBean);
         }
 
     }

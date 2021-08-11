@@ -76,10 +76,10 @@ public class AopUtils {
      */
     public static Object findJdkTarget(Object bean) throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException {
 
-        Field h = bean.getClass().getSuperclass().getField("h");
+        Field h = bean.getClass().getSuperclass().getDeclaredField("h");
         h.setAccessible(true);
         Object jdkProxy = h.get(bean);
-        Field targetField = jdkProxy.getClass().getField("target");
+        Field targetField = jdkProxy.getClass().getDeclaredField("target");
         targetField.setAccessible(true);
         //原生对象
         Object target = targetField.get(jdkProxy);

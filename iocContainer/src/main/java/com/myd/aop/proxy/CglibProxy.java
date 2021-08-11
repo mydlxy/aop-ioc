@@ -52,9 +52,7 @@ public class CglibProxy implements MethodInterceptor {
             if(!exeAdvice(method, AdviceType.Around)){
                 exeAdvice(method,AdviceType.Before);
             }
-
             returnVal = methodProxy.invokeSuper(o, objects);
-
             if(exeAdvice(method,AdviceType.Around)){
                 exeFinally=false;
             }else{
