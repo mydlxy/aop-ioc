@@ -109,6 +109,7 @@ public class AopUtils {
 
 
     public static boolean containAdvice(AdviceType type, List<Advice> advices){
+        if(advices == null)return false;
         for ( Advice advice : advices) {
             if(advice.getType().equals(type))return true;
         }
@@ -116,6 +117,7 @@ public class AopUtils {
     }
 
     public static Advice getAdvice(AdviceType type, List<Advice> advices){
+        if(advices == null)return null;
         for (final Advice advice : advices) {
             if(advice.getType().equals(type))return advice;
         }
