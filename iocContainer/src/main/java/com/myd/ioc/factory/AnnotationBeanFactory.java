@@ -81,10 +81,9 @@ public class AnnotationBeanFactory {
         Map<String,Object> scanBeans = new HashMap<>();
         for (String className : classNames) {
             Class beanClass = Class.forName(className);
-            if(beanClass.isInterface())continue;
-            Object bean = beanClass.newInstance();
             Component component = (Component) beanClass.getAnnotation(Component.class);
             if(component == null)continue;
+            Object bean = beanClass.newInstance();
             String id = getComponentId(beanClass,component);
             List<Field> autowired = AopUtils.findFieldAnnotation(beanClass,Autowired.class);
             List<Field> values = AopUtils.findFieldAnnotation(beanClass, Value.class);
