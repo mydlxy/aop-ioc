@@ -1,6 +1,7 @@
 package parse;
 
 import com.myd.aop.AopUtils;
+import com.myd.aop.config.AspectConfig;
 import com.myd.aop.proxy.CglibProxy;
 import com.myd.aop.proxy.JDKProxy;
 import com.myd.ioc.annotations.Autowired;
@@ -126,6 +127,7 @@ public class TestAOP {
 
     @Test
     public void testSaveClassFile(){
+        //cglib下载生成类的class
         System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "/ww");
 
         CglibProxy modelProxy = new CglibProxy(new Model(),null);
@@ -245,6 +247,17 @@ public class TestAOP {
     }
 
     @Test
+    public void test78(){
+
+        String execution = AspectConfig.getExecution();
+        System.out.println(execution);
+
+        String exe  ="execution( * com.*myd.gg.name*(int[] ,inn, Boolean[] ) ) ";
+        boolean isTure = exe.matches(execution);
+        System.out.println(isTure);
+
+    }
+    @Test
     public void test34() throws IOException, ClassNotFoundException {
 
         ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("tt"));
@@ -257,10 +270,13 @@ public class TestAOP {
     public void testJDK()throws Exception{
 
         U2  u = new U2();
-//        System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
-//        byte[] proxy00s = ProxyGenerator.generateProxyClass("proxy000", U2.class.getInterfaces());
-//        FileOutputStream fileOutputStream = new FileOutputStream("./Proxy000.class");
-//        fileOutputStream.write(proxy00s);
+        //cglib save class
+//        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "/ww");
+        //jdk save class
+        System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
+        byte[] proxy00s = ProxyGenerator.generateProxyClass("proxy1", U2.class.getInterfaces());
+        FileOutputStream fileOutputStream = new FileOutputStream("./Proxy1.class");
+        fileOutputStream.write(proxy00s);
         JDKProxy jdkProxy = new JDKProxy(u,null);
         T t = jdkProxy.newInstance();
 
@@ -318,4 +334,5 @@ public class TestAOP {
         System.out.println(instance.toString());
 
     }
+
 }

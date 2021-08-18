@@ -3,6 +3,7 @@ package com.myd.aop.proxy;
 import com.myd.aop.AdviceType;
 import com.myd.aop.AopUtils;
 import com.myd.aop.advice.Advice;
+import com.myd.aop.exception.TargetMethodError;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -46,13 +47,17 @@ public class CglibProxy implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
 
-        Object returnVal;
+        Object returnVal=null;
         boolean exeFinally=true;
         try {
             if(!exeAdvice(method, AdviceType.Around)){
                 exeAdvice(method,AdviceType.Before);
             }
-            returnVal = methodProxy.invokeSuper(o, objects);
+            try {
+                returnVal = methodProxy.invokeSuper(o, objects);
+            }catch(Throwable e){
+                throw  new TargetMethodError(e);
+            }
             if(exeAdvice(method,AdviceType.Around)){
                 exeFinally=false;
             }else{
@@ -60,13 +65,15 @@ public class CglibProxy implements MethodInterceptor {
                     exeFinally=false;
             }
         }catch(Throwable e){
-            if(exeAdvice(method,AdviceType.Around)){
-                exeFinally=false;
-            }else{
-                if(exeAdvice(method,AdviceType.AfterThrowable))
+            if(e instanceof TargetMethodError)
+                if(exeAdvice(method,AdviceType.Around)){
                     exeFinally=false;
-            }
-            throw new Throwable(e);
+                }else{
+                    if(exeAdvice(method,AdviceType.AfterThrowable))
+                        exeFinally=false;
+                }
+            else
+                throw new Throwable(e);
         }finally {
             if(exeFinally)
                 exeAdvice(method,AdviceType.After);

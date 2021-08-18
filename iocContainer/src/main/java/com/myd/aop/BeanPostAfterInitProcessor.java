@@ -2,6 +2,7 @@ package com.myd.aop;
 import com.myd.aop.advice.*;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
+import com.myd.aop.filter.Pointcut;
 import com.myd.aop.proxy.CglibProxy;
 import com.myd.aop.proxy.JDKProxy;
 import com.myd.ioc.beans.IocContainer;
@@ -17,16 +18,7 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
 
     private AspectConfig aspectConfig;
 
-    private BeforeAdvice beforeAdvice;
-
-    private AfterAdvice afterAdvice;
-
-    private AfterReturningAdvice afterReturningAdvice;
-
-    private AfterThrowableAdvice afterThrowableAdvice;
-
-    private AroundAdvice aroundAdvice;
-
+    private List<Advice> adviceList = new ArrayList<>();
 
     private static BeanPostAfterInitProcessor beanPostAfterInitProcessor;
 
@@ -49,16 +41,15 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
         String aspectId = aspectConfig.getId();
         Object aspect  =getBeans().get(aspectId);
         aspectConfig.setAspect(aspect);
-        if(aspectConfig.getBefore()!=null)
-            beforeAdvice = new BeforeAdvice();
-        if(aspectConfig.getAfter()!= null)
-            afterAdvice = new AfterAdvice();
-        if(aspectConfig.getAfterReturning()!= null)
-            afterReturningAdvice = new AfterReturningAdvice();
-        if(aspectConfig.getAfterThrowable()!=null)
-            afterThrowableAdvice = new AfterThrowableAdvice();
-        if(aspectConfig.getAround()!= null)
-            aroundAdvice = new AroundAdvice();
+        Map<AdviceType, Pointcut> adviceMap = aspectConfig.getAdviceList();
+        if(adviceMap == null || adviceMap.isEmpty())return;
+        for(Iterator<AdviceType> iter = adviceMap.keySet().iterator();iter.hasNext();){
+           AdviceType type = iter.next();
+           Pointcut pointcut = adviceMap.get(type);
+           Advice advice = new StandardAdvice(type,aspect,pointcut);
+           adviceList.add(advice);
+        }
+
     }
 
 
@@ -66,19 +57,6 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
     public Map<String, Object> iocContainer(){
         return getBeans();
     }
-
-//    public void postProcessAllBean(){
-//        Map<String, Object> beans = getBeans();
-//        String aspectId = aspectConfig.getId();
-//        for(Iterator<String> iter= beans.keySet().iterator();iter.hasNext();){
-//            String key = iter.next();
-//            if(key.equals(aspectId))continue;
-//            Object bean = beans.get(key);
-//            Object postBean = postProcessAfterInitialization(bean);
-//            if(bean != postBean)
-//                beans.put(key,postBean);
-//        }
-//    }
 
 
 
@@ -114,22 +92,9 @@ public class BeanPostAfterInitProcessor extends IocContainer implements BeanPost
 
     public List<Advice> matchAdvice(Object bean){
         List<Advice> advices = new ArrayList<>();
-        if(aroundAdvice != null && aroundAdvice.matchClass(bean)){
-            advices.add(aroundAdvice);
+        for (Advice advice : adviceList) {
+           if(advice.matchClass(bean))advices.add(advice);
         }
-        if(beforeAdvice != null && beforeAdvice.matchClass(bean)){
-            advices.add(beforeAdvice);
-        }
-        if(afterAdvice != null && afterAdvice.matchClass(bean)){
-            advices.add(afterAdvice);
-        }
-        if(afterReturningAdvice != null && afterReturningAdvice.matchClass(bean)){
-            advices.add(afterReturningAdvice);
-        }
-        if(afterThrowableAdvice != null && afterThrowableAdvice.matchClass(bean)){
-            advices.add(afterThrowableAdvice);
-        }
-
         return advices;
     }
 

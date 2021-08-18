@@ -3,6 +3,8 @@ package com.myd.aop.proxy;
 import com.myd.aop.AdviceType;
 import com.myd.aop.AopUtils;
 import com.myd.aop.advice.Advice;
+import com.myd.aop.exception.TargetMethodError;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,14 +32,18 @@ public class JDKProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         //测试时，临时添加；
-        Object returnVal;
+        Object returnVal=null;
         boolean exeFinally=true;
         try {
             if(!exeAdvice(method, AdviceType.Around)){
                 exeAdvice(method,AdviceType.Before);
             }
 
-            returnVal =  method.invoke(target,args);
+            try {
+                returnVal = method.invoke(target, args);
+            }catch (Throwable e){
+                throw new TargetMethodError(e);
+            }
 
             if(exeAdvice(method,AdviceType.Around )){
                 exeFinally=false;
@@ -46,13 +52,15 @@ public class JDKProxy implements InvocationHandler {
                     exeFinally=false;
             }
         }catch(Throwable e){
-            if(exeAdvice(method,AdviceType.Around)){
-                exeFinally=false;
-            }else{
-                if(exeAdvice(method,AdviceType.AfterThrowable))
+            if(e instanceof TargetMethodError)
+                if(exeAdvice(method,AdviceType.Around)){
                     exeFinally=false;
-            }
-            throw new Throwable(e);
+                }else{
+                    if(exeAdvice(method,AdviceType.AfterThrowable))
+                        exeFinally=false;
+                }
+            else
+                throw new Throwable(e);
         }finally {
             if(exeFinally)
                 exeAdvice(method,AdviceType.After);

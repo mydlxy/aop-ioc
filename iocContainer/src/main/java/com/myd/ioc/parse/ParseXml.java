@@ -216,41 +216,29 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         AspectConfig aspectConfig = AspectConfig.getAspectConfig().setId(id.trim());
         List<Element> elements = aspect.elements();
         for (Element element : elements) {
-            String name = element.getName();
-            XmlUtils.checkAspectNodeName(name);
-            String pointcut = element.attributeValue("pointcut");
+            String adviceType = element.getName().trim();
+            XmlUtils.checkAspectNodeName(adviceType);
+            String pointcut = element.attributeValue("pointcut").trim();
             if(pointcut== null || pointcut.trim().length()==0)
-                throw new NullPointerException("aspect:"+id+","+name+" pointcut is null error...");
+                throw new NullPointerException("aspect:"+id+","+adviceType+" pointcut is null error...");
 //            aspectConfig.trim(pointcut)
-            String methodName = element.attributeValue("method");
+            String methodName = element.attributeValue("method").trim();
             if(methodName== null || methodName.trim().length()==0)
-                throw new NullPointerException("aspect:"+id+","+name+" method is null error...");
-            setAspectConfigValue(aspectConfig,name,pointcut,methodName);
+                throw new NullPointerException("aspect:"+id+","+adviceType+" method is null error...");
+//            setAspectConfigValue(aspectConfig,adviceType,pointcut,methodName);
+            aspectConfig.addAdvice(UpperFirst(adviceType),pointcut,methodName);
         }
 
     }
 
 
-
-
-    public static void setAspectConfigValue(AspectConfig aspectConfig,String name,String pointcut,String methodName)  {
-        String formatPointcut = aspectConfig.formatPointcut(pointcut);
-        Map<String,String> map = new HashMap<>();
-        map.put(formatPointcut,methodName.trim());
-        String setName = "set"+name.toUpperCase().charAt(0)+name.substring(1);
-        try {
-            Method method = aspectConfig.getClass().getMethod(setName,Map.class);
-            method.invoke(aspectConfig,map);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-
+    public static String UpperFirst(String str){
+        return str.toUpperCase().substring(0,1)+str.substring(1);
     }
+
+
+
+
 
 
 

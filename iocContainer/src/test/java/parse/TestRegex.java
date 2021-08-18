@@ -1,7 +1,5 @@
 package parse;
 
-import com.myd.aop.BeanPostAfterInitProcessor;
-import com.myd.aop.advice.BeforeAdvice;
 import com.myd.aop.config.AspectConfig;
 import com.myd.aop.filter.ClassFilter;
 import com.myd.aop.proxy.JDKProxy;
@@ -22,6 +20,17 @@ import java.util.Map;
 
 public class TestRegex {
 
+
+    public String UpperFirst(String str){
+        return str.toUpperCase().substring(0,1)+str.substring(1);
+    }
+
+    @Test
+    public void test34(){
+
+        String t = "wrwe";
+        System.out.println(UpperFirst(t));
+    }
     @Test
     public void test1(){
 
@@ -90,7 +99,7 @@ public class TestRegex {
     public void test3(){
         String pointcut = "execution(* ter*.*sdf.*d8*.*..test(int,Sdf[] , byte[] ) )  ";
         AspectConfig aspectConfig = AspectConfig.getAspectConfig();
-        pointcut = aspectConfig.trim(pointcut);
+//        pointcut = aspectConfig.trim(pointcut);
         System.out.println(pointcut);
         String s = ClassFilter.packageRegex(pointcut);
         System.out.println(ClassFilter.regexClass(s));
@@ -133,7 +142,7 @@ public class TestRegex {
         String methodName = "beforeTest";
         HashMap<String, String> before = new HashMap<>();
         before.put(exe,methodName);
-        config.setBefore(before);
+//        config.setBefore(before);
         String u2Name = U2.class.getName();
         U2 u2 = new U2();
 
@@ -178,7 +187,7 @@ public class TestRegex {
         String methodName = "beforeTest";
         HashMap<String, String> before = new HashMap<>();
         before.put(beforePointcu,methodName);
-        config.setBefore(before);
+//        config.setBefore(before);
 
         IocContainer container = IocContainer.container();
         container.registerBean("uu",new UU());

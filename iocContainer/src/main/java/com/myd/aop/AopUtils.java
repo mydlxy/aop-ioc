@@ -66,7 +66,7 @@ public class AopUtils {
 
     /**
      *
-     * 返回JDK动态代理对象的MUBIAO 对象：target
+     * 返回JDK动态代理对象的目标 对象：target
      * @param bean：JDK动态代理生成的动态代理对象
      * @return
      * @throws ClassNotFoundException

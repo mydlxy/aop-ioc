@@ -15,11 +15,14 @@ public class U2 implements T{
         System.out.println(getClass().getSimpleName()+";method=t1");
     }
 
-    public void t2(){
+    public void t2()
+    {
+        t3();
         System.out.println(getClass().getSimpleName()+";method=t2");
     }
 
     public void t3(){
+        t1();
         System.out.println(getClass().getSimpleName()+";method=t3");
     }
 
