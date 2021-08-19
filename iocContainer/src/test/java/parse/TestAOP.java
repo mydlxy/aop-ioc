@@ -249,12 +249,12 @@ public class TestAOP {
     @Test
     public void test78(){
 
-        String execution = AspectConfig.getExecution();
-        System.out.println(execution);
+//        String execution = AspectConfig.getExecution();
+//        System.out.println(execution);
 
         String exe  ="execution( * com.*myd.gg.name*(int[] ,inn, Boolean[] ) ) ";
-        boolean isTure = exe.matches(execution);
-        System.out.println(isTure);
+//        boolean isTure = exe.matches(execution);
+//        System.out.println(isTure);
 
     }
     @Test

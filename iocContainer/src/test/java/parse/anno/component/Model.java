@@ -27,6 +27,7 @@ public class Model  {
 
     @Override
     public String toString() {
+        System.out.println("model's toString method...");
         return "Model{" +
                 "name='" + name + '\'' +
                 ", modelType='" + modelType + '\'' +

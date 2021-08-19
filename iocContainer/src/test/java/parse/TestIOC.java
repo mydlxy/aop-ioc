@@ -60,6 +60,16 @@ public class TestIOC {
         System.out.println(model.toString());
     }
 
+
+    public void test44(){
+
+       new Thread(new Runnable() {
+           @Override
+           public void run() {
+
+           }
+       }).start();
+    }
     @Test
     public void pathTest(){
         String path = ParseXml.class.getPackage().getName();

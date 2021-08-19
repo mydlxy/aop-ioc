@@ -6,6 +6,8 @@ import com.myd.ioc.beans.BeanDefinition;
 import com.myd.ioc.beans.PropertyValue;
 import com.myd.ioc.exception.RefNotFoundError;
 import com.myd.ioc.exception.XmlLabelNameError;
+import com.myd.ioc.parse.processNode.NodeFactory;
+import com.myd.ioc.parse.processNode.XmlNode;
 import com.myd.ioc.utils.BeanUtils;
 import com.myd.ioc.utils.XmlUtils;
 import org.dom4j.Document;
@@ -46,95 +48,22 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         for (Element element : elements) {
             String name = element.getName();//获取标签名；
             XmlUtils.checkRootNodeName(name);
-            if(name.equals("bean")){//解析bean标签
-                parseBean(element, xmlConfiguration);
-            }else if(name.equals("propertyPlaceholder")){//加载properties文件
-                parsePropertiesFile(element, xmlConfiguration);
-             }else if(name.equals("ComponentScan")){
-                //后续添加annotation解析;
-                xmlConfiguration.setAnnotationPackage(element.attributeValue("package"));
-            }else if(name.equals("aspect")){
-                aspectConfig(element);
-            }
+            XmlNode node  = NodeFactory.create(name);
+            node.processNode(element,xmlConfiguration);
         }
         log.info("parse xml has end.....");
         //将 '${}'替换成值
         replaceBeanDefinitionValue(xmlConfiguration.getProperties(), xmlConfiguration.getBeanDefinitions().values());
-
         //检查bean属性引用的ref值是否正确
         checkBeanPropertyRef(xmlConfiguration);
-
 
         return xmlConfiguration;
 
     }
 
-    /**
-     * 解析bean标签
-     *
-     * <bean id="" class="">
-     *  <constructor name="" value=""/>
-     *  <constructor name="" ref=""/>
-     *  <property name="" value=""/>
-     *  <property name="" ref=""/>
-     * </bean>
-     * @param bean
-     * @return
-     */
-    public static void parseBean(Element bean, XmlConfiguration xmlConfiguration){
-
-        BeanDefinition beanDefinition = new BeanDefinition();
-        String id = bean.attributeValue("id");
-        String className = bean.attributeValue("class");
-        beanDefinition.setId(id).setClassName(className);
-        List<Element> properties = bean.elements();
-        for (Element property : properties) {//属性解析
-            PropertyValue propertyValue = new PropertyValue();
-            String name = property.getName();
-            XmlUtils.checkBeanNodeName(name);
-            if(name.equals("constructor")){
-                parseBeanProperty(property,propertyValue,beanDefinition.getConstructorValues());
-            }else{
-                parseBeanProperty(property,propertyValue,beanDefinition.getPropertyValues());
-            }
-
-        }
-        xmlConfiguration.addBeanDefinition(id,beanDefinition);
-    }
-
-    /**
-     * 解析bean的属性标签
-     *<property name="" value=""/>
-     *<property name ="" ref=""/>
-     * @param property
-     * @param propertyValue
-     */
-    public static void parseBeanProperty(Element property,PropertyValue propertyValue,List<PropertyValue> beanValues){
-        String name = property.attributeValue("name");
-        propertyValue.setPropertyName(property.attributeValue("name"));
-        String value = property.attributeValue("value");
-        if(value != null){
-            propertyValue.setValue(value).setRef(false);
-        }else{
-            propertyValue.setValue(property.attributeValue("ref")).setRef(true);
-        }
-        beanValues.add(propertyValue);
-    }
 
 
-    /**
-     *
-     * 解析标签：propertyPlaceholder
-     * <propertyPlaceholder load="path"/>
-     *
-     * @param propertiesFile
-     */
-    public static void parsePropertiesFile(Element propertiesFile, XmlConfiguration xmlConfiguration)throws IOException{
-        String path = propertiesFile.attributeValue("load");
-        xmlConfiguration.setPropertiesPath(path);
-        Properties properties = ParseProperty.parseProperty(path);
-        xmlConfiguration.setProperties(properties);
-    }
+
 
 
     /**
@@ -207,34 +136,6 @@ private static Logger log  = Logger.getLogger(ParseXml.class);
         }
     }
 
-
-
-    public static void aspectConfig(Element aspect){
-        String id = aspect.attributeValue("id");
-        if(id == null || id.trim().length()==0)
-            throw new NullPointerException("aspect id is null error...");
-        AspectConfig aspectConfig = AspectConfig.getAspectConfig().setId(id.trim());
-        List<Element> elements = aspect.elements();
-        for (Element element : elements) {
-            String adviceType = element.getName().trim();
-            XmlUtils.checkAspectNodeName(adviceType);
-            String pointcut = element.attributeValue("pointcut").trim();
-            if(pointcut== null || pointcut.trim().length()==0)
-                throw new NullPointerException("aspect:"+id+","+adviceType+" pointcut is null error...");
-//            aspectConfig.trim(pointcut)
-            String methodName = element.attributeValue("method").trim();
-            if(methodName== null || methodName.trim().length()==0)
-                throw new NullPointerException("aspect:"+id+","+adviceType+" method is null error...");
-//            setAspectConfigValue(aspectConfig,adviceType,pointcut,methodName);
-            aspectConfig.addAdvice(UpperFirst(adviceType),pointcut,methodName);
-        }
-
-    }
-
-
-    public static String UpperFirst(String str){
-        return str.toUpperCase().substring(0,1)+str.substring(1);
-    }
 
 
 

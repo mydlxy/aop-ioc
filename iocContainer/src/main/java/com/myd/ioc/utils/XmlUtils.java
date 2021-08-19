@@ -1,6 +1,7 @@
 package com.myd.ioc.utils;
 
 import com.myd.ioc.exception.XmlLabelNameError;
+import org.dom4j.Element;
 
 /**
  * @author myd
@@ -73,7 +74,7 @@ public class XmlUtils {
                 case bean:
                 case propertyPlaceholder:
                 case aspect:
-                case ComponentScan:
+                case componentScan:
                     break;
                 default:
                     throw new XmlLabelNameError("标签:<" + nodeName + "> ,不是<beans>的子标签。");
@@ -86,5 +87,10 @@ public class XmlUtils {
 
     }
 
+
+
+    public static String attributeValue(Element element,String attribute){
+        return element.attributeValue(attribute) == null?null:element.attributeValue(attribute).trim();
+    }
 
 }

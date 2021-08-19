@@ -24,6 +24,6 @@
     </aspect>
 
 
-    <ComponentScan package="parse.anno.component"/>
+    <componentScan package="parse.anno.component"/>
 
 </beans>

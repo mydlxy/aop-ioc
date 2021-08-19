@@ -218,4 +218,15 @@ public class BeanUtils {
     }
 
 
+    /**
+     *
+     * 首字母大写
+     * @param str
+     * @return
+     */
+    public static String UpperFirst(String str){
+        return str.toUpperCase().substring(0,1)+str.substring(1);
+    }
+
+
 }
