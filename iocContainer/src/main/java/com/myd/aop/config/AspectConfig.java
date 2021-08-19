@@ -15,41 +15,7 @@ import java.util.regex.Pattern;
 
 public class AspectConfig {
 
-//    private static final String EXECUTION ="\\s*execution\\s*\\(\\s*(public|protected|private|\\*)\\s+(((\\*?\\w+\\*?|\\*)\\.)+\\.?)?(\\*?\\w+\\*?|\\*)\\(\\s*(\\.\\.|([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*(,\\s*([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*)*|)\\)\\s*\\)\\s*";
-    private static final String EXECUTION;
-
-    private static final String modifier;
-
-    private static final String packagePath;
-
-    private static final String methodName;
-
-    private static final String methodParamList;
-
-    private static final String methodSingleParamType;
-
-    private static final String methodAllParamType;
-
-    private static final String methodNoParam;
-    static {
-        modifier = "(public|protected|private|\\*)";
-        packagePath = "(((\\*?\\w+\\*?|\\*)\\.)+\\.?)?";
-        methodName = "(\\*?\\w+\\*?|\\*)";
-
-        methodSingleParamType = "\\s*([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*";
-        methodAllParamType = "..";
-        methodNoParam = "";
-        methodParamList = "("+methodAllParamType+"|"+methodSingleParamType+"(,"+methodSingleParamType+")*|"+methodNoParam+")";
-
-        EXECUTION = "\\s*execution\\s*\\(\\s*"+modifier+"\\s+"+packagePath+methodName+"\\("+methodParamList+"\\)\\s*\\)\\s*";
-
-    }
-
-    public static String getExecution(){
-       return EXECUTION;
-    }
-
-    private Object aspect;
+    private Object aspect;//在创建beanPostAfterInitProcessor时候初始化；
 
     private String id;
 

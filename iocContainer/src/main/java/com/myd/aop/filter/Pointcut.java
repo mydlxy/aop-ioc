@@ -16,30 +16,30 @@ public class Pointcut {
 //    private static final String EXECUTION ="\\s*execution\\s*\\(\\s*(public|protected|private|\\*)\\s+(((\\*?\\w+\\*?|\\*)\\.)+\\.?)?(\\*?\\w+\\*?|\\*)\\(\\s*(\\.\\.|([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*(,\\s*([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*)*|)\\)\\s*\\)\\s*";
     private static final String EXECUTION;
 
-    private static final String modifier;
+    private static final String modifierRegex;//访问修饰符
 
-    private static final String packagePath;
+    private static final String packagePathRegex;//包路径
 
-    private static final String methodNameRegex;
+    private static final String methodNameRegex;//方法名
 
-    private static final String methodParamList;
+    private static final String methodParamListRegex;//参数列表
 
-    private static final String methodSingleParamType;
+    private static final String methodSingleParamTypeRegex;//单个参数的数据类型
 
-    private static final String methodAllParamType;
+    private static final String methodAllParamTypeRegex;
 
-    private static final String methodNoParam;
+    private static final String methodNoParamRegex;
     static {
-        modifier = "(public|protected|private|\\*)";
-        packagePath = "(((\\*?\\w+\\*?|\\*)\\.)+\\.?)?";
+        modifierRegex = "(public|protected|private|\\*)";
+        packagePathRegex = "(((\\*?\\w+\\*?|\\*)\\.)+\\.?)?";
         methodNameRegex = "(\\*?\\w+\\*?|\\*)";
 
-        methodSingleParamType = "\\s*([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*";
-        methodAllParamType = "..";
-        methodNoParam = "";
-        methodParamList = "("+methodAllParamType+"|"+methodSingleParamType+"(,"+methodSingleParamType+")*|"+methodNoParam+")";
+        methodSingleParamTypeRegex = "\\s*([A-Z]\\w*|int|double|float|char|byte|long|short|boolean)(\\[\\])*\\s*";
+        methodAllParamTypeRegex = "..";
+        methodNoParamRegex = "";
+        methodParamListRegex = "("+methodAllParamTypeRegex+"|"+methodSingleParamTypeRegex+"(,"+methodSingleParamTypeRegex+")*|"+methodNoParamRegex+")";
 
-        EXECUTION = "\\s*execution\\s*\\(\\s*"+modifier+"\\s+"+packagePath+methodNameRegex+"\\("+methodParamList+"\\)\\s*\\)\\s*";
+        EXECUTION = "\\s*execution\\s*\\(\\s*"+modifierRegex+"\\s+"+packagePathRegex+methodNameRegex+"\\("+methodParamListRegex+"\\)\\s*\\)\\s*";
     }
 
 
@@ -54,8 +54,8 @@ public class Pointcut {
 
 
    public String getMethodName(){
-       return methodName;
-   }
+        return methodName;
+    }
 
     /**
      *
