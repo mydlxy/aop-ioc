@@ -37,19 +37,13 @@ public class AspectNode implements XmlNode {
     @Override
     public void processNode(Element aspect) {
         String id = XmlUtils.attributeValue(aspect,"id");
-        if(id == null || id.length()==0)
-            throw new NullPointerException("aspect id is null error...");
         AspectConfig aspectConfig = AspectConfig.getAspectConfig().setId(id);
         List<Element> elements = aspect.elements();
         for (Element element : elements) {
             String adviceType = element.getName().trim();
             XmlUtils.checkAspectNodeName(adviceType);
             String pointcut =XmlUtils.attributeValue(element,"pointcut");
-            if(pointcut== null || pointcut.length()==0)
-                throw new NullPointerException("aspect:"+id+","+adviceType+" pointcut is null error...");
             String methodName = XmlUtils.attributeValue(element,"method");
-            if(methodName== null || methodName.length()==0)
-                throw new NullPointerException("aspect:"+id+","+adviceType+" method is null error...");
             aspectConfig.addAdvice(BeanUtils.UpperFirst(adviceType),pointcut,methodName);
         }
 

@@ -82,15 +82,17 @@ public class XmlUtils {
         }catch(IllegalArgumentException e){
             throw new XmlLabelNameError("不支持标签:<" + nodeName + "> ,在枚举类： NodeName 中定义了xml支持的标签格式。");
         }
-
-
-
     }
-
 
 
     public static String attributeValue(Element element,String attribute){
-        return element.attributeValue(attribute) == null?null:element.attributeValue(attribute).trim();
+        String value = element.attributeValue(attribute);
+        if(value == null || value.trim().length() == 0)
+            throw new NullPointerException("XML NODE:"+element.getName()+"'s  attribute :"+attribute +" value is null.");
+        return  value.trim();
     }
+
+
+
 
 }
