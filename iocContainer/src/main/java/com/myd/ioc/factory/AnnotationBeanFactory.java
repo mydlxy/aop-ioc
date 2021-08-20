@@ -125,12 +125,12 @@ public class AnnotationBeanFactory {
      *
      * jdk代理生成的对象，被代理之后注解不会丢失（因为动态代理生成的代理对象，会持有原生类对象）
      * 被JDK代理生成的类是Proxy的子类（被代理类的继承结构：BeanProxy  extends Proxy  implements Interface1,Interface2..）
-     * 而原生类的对象被注入到父类Proxy的一个字段：h；
+     * 而原生类的对象被注入到父类Proxy的一个字段：h(InvocationHandler)；
      * 因此jdk动态代理类，可以获取原生类的信息;
-     * 原生类:target
+     * 原生类:h.target
      * 生成新对象：Proxy.newInstance(target.getClass(),target.getClass().getInterfaces(),this);
      * BeanProxy beanProxy = new BeanProxy();
-     * beanProxy.super.h = target;
+     * beanProxy.super.h.target =target ;
      *
      *
      *
