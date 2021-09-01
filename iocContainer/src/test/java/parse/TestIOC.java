@@ -1,5 +1,6 @@
 package parse;
 
+import com.myd.aop.filter.Pointcut;
 import com.myd.ioc.context.ApplicationContext;
 import com.myd.ioc.context.XmlApplicationContext;
 import com.myd.ioc.parse.ParseXml;
@@ -24,6 +25,44 @@ import java.util.List;
  */
 
 public class TestIOC {
+
+
+
+    class Human{
+        public void sayHello(){
+            System.out.println("human say hello.");
+        }
+
+    }
+
+    class Man extends Human{
+        public void sayHello(){
+            System.out.println("man say hello.");
+        }
+
+
+    }
+    class Women extends Human{
+        public void sayHello(){
+            System.out.println("Women say hello.");
+        }
+
+    }
+
+
+
+
+    @Test
+    public void test66(){
+
+        Human h  = new Man();
+
+        Human w = new Women();
+
+       h.sayHello();
+       w.sayHello();
+    }
+
 
     @Test
     public void test() throws Exception {

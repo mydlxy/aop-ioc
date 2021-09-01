@@ -1,6 +1,19 @@
 <beans>
     <propertyPlaceholder load="test.properties"/>
 
+
+    <bean id="a" class="parse.A">
+        <constructor name="b" ref="b"/>
+    </bean>
+
+    <bean id="b" class="parse.B">
+        <constructor name="c" ref="c"/>
+    </bean>
+
+    <bean id="c" class="parse.C">
+        <constructor name="a" ref="a"/>
+    </bean>
+
     <bean id="t" class="parse.model.Teacher">
 
         <constructor name="classNo" value="55"/>

@@ -51,7 +51,7 @@ public enum NodeName {
     /**
      *
      * 注解，
-     * <ComponentScan package=""/>
+     * <componentScan package=""/>
      *  package:指定扫描包
      */
     componentScan,

@@ -41,15 +41,6 @@ public class CglibTest {
         Model t = create(model);
         System.out.println(t.getName());
         Value value = getClass().getSuperclass().getDeclaredField("").getAnnotation(Value.class);
-
-
-
-
-
-//        m.getSuperclass().get
-
-
-
     }
 
     @Test

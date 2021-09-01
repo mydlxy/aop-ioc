@@ -8,17 +8,13 @@ import com.myd.ioc.beans.IocContainer;
 import com.myd.ioc.context.XmlConfiguration;
 import com.myd.ioc.exception.PropertiesKeyNotFound;
 import com.myd.ioc.exception.PropertiesKeyRepeatError;
-import com.myd.ioc.exception.RefNotFoundError;
 import com.myd.ioc.parse.ParseProperty;
 import com.myd.ioc.utils.BeanUtils;
 import com.myd.ioc.utils.ReflectUtils;
 import com.myd.ioc.utils.RegexUtils;
 import org.apache.log4j.Logger;
 
-import javax.swing.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;

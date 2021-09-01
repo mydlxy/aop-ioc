@@ -65,11 +65,11 @@ public class BeanNode implements XmlNode {
     public static void parseBeanProperty(Element property, PropertyValue propertyValue, List<PropertyValue> beanValues){
         String name = XmlUtils.attributeValue(property,"name");
         propertyValue.setPropertyName(name);
-        String value = XmlUtils.attributeValue(property,"value");
+        String value =  property.attributeValue("value");
         if(value != null){
             propertyValue.setValue(value).setRef(false);
         }else{
-            propertyValue.setValue( XmlUtils.attributeValue(property,"ref")).setRef(true);
+            propertyValue.setValue(XmlUtils.attributeValue(property,"ref")).setRef(true);
         }
         beanValues.add(propertyValue);
     }
