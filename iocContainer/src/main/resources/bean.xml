@@ -2,6 +2,7 @@
     <propertyPlaceholder load="test.properties"/>
 
 
+<!--
     <bean id="a" class="parse.A">
         <constructor name="b" ref="b"/>
     </bean>
@@ -13,6 +14,7 @@
     <bean id="c" class="parse.C">
         <constructor name="a" ref="a"/>
     </bean>
+-->
 
     <bean id="t" class="parse.model.Teacher">
 

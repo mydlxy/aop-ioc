@@ -95,7 +95,7 @@ public class TestIOC {
         ApplicationContext context = new XmlApplicationContext("bean.xml");
         T2 t = context.getBean(T2.class);
 //        System.out.println(t.getClass().getName());
-        Model model  = context.getBean("modeImpl");
+        T2 model  = context.getBean(T2.class);
         System.out.println(model.toString());
     }
 

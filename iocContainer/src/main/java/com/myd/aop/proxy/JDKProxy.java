@@ -60,7 +60,8 @@ public class JDKProxy implements InvocationHandler {
                         exeFinally=false;
                 }
             else
-                throw new Throwable(e);
+                exeFinally=false;
+            throw new Throwable(e);
         }finally {
             if(exeFinally)
                 exeAdvice(method,AdviceType.After);

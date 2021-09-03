@@ -31,6 +31,7 @@ public class DatabaseConfig implements T2 {
 
     @Override
     public String toString() {
+        int i = 1/0;
         return "DatabaseConfig{" +
                 "username='" + username + '\'' +
                 ", url='" + url + '\'' +
@@ -41,6 +42,7 @@ public class DatabaseConfig implements T2 {
 
     @Override
     public void print() {
+        int i = 1/0;
         System.out.println("beanName:"+getClass().getName()+";"+toString());
     }
 }

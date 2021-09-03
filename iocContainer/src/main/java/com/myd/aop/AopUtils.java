@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class AopUtils {
         h.setAccessible(true);
         Object jdkProxy = h.get(bean);
         Field targetField = jdkProxy.getClass().getDeclaredField("target");
-        targetField.setAccessible(true);
+       targetField.setAccessible(true);
         //原生对象
         Object target = targetField.get(jdkProxy);
         return target;
@@ -97,8 +98,10 @@ public class AopUtils {
     public static void injectAutowired(Object bean,List<Field> fields) throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException {
         IocContainer container = IocContainer.container();
         //com.sun.proxy.$Proxy9--->一般jdk动态代理类的类名是：com.sun.proxy.$Proxy+数字
-        if(bean.getClass().getName().matches("com\\.sun\\.proxy\\.\\$Proxy.*")){
+//        if(bean.getClass().getName().matches("com\\.sun\\.proxy\\.\\$Proxy.*")){
+        if(Proxy.class.isInstance(bean)){
             bean =findJdkTarget(bean);
+
         }
         for (Field field : fields) {
             String typeName = field.getType().getTypeName();

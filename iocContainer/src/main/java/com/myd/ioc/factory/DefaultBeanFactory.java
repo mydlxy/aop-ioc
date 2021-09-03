@@ -83,7 +83,7 @@ public class DefaultBeanFactory implements BeanFactory {
         if(container.isRegister(id))return null;
         String className = beanDefinition.getClassName();
         if(currentCreateBean.contains(className)){
-            throw new CircularDependencyError(className+" created bean circular dependency error...");
+            throw new CircularDependencyError(className+" init  circular dependency error...");
         }
         currentCreateBean.add(className);
         Class<?> beanClass = Class.forName(className);
